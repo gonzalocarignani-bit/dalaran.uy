@@ -1,11 +1,451 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Dalaran</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dalaran — Juegos de Mesa in-stock</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;margin:0;background:#0b0c10;color:#e8e8e8}
+    header{position:sticky;top:0;background:rgba(11,12,16,.92);backdrop-filter: blur(8px);border-bottom:1px solid rgba(255,255,255,.08);padding:14px 16px;z-index:10}
+    .meta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:6px 10px;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.06);font-size:12px}
+    .pill b{font-weight:650}
+    .wrap{padding:16px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+    .card{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.05);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:320px}
+    .thumb{aspect-ratio: 1 / 1; background:rgba(255,255,255,.04); display:flex; align-items:center; justify-content:center}
+    .thumb img{width:100%;height:100%;object-fit:contain;background:#111}
+    .body{padding:12px 12px 14px;display:flex;flex-direction:column;gap:10px;flex:1}
+    .name{font-size:13px;line-height:1.25;color:#f1f1f1}
+    .price{font-size:14px;font-weight:700}
+    .muted{opacity:.75;font-size:12px}
+    a{color:inherit;text-decoration:none}
+    .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+    .search{min-width:240px;max-width:520px;flex:1;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#e8e8e8;padding:9px 10px;border-radius:10px;outline:none}
+    .btn{cursor:pointer;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#e8e8e8;padding:8px 10px;border-radius:10px;font-size:12px}
+    .btn:hover{background:rgba(255,255,255,.10)}
+    .btn.danger{border-color:rgba(255,120,120,.35)}
+    .btn.danger:hover{background:rgba(255,120,120,.12)}
+    .num{width:120px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#e8e8e8;padding:9px 10px;border-radius:10px;outline:none}
+    .small{font-size:12px;opacity:.8}
+    .err{color:#ffb3b3}
+    .ok{color:#b6ffcc}
+  </style>
 </head>
-<body style="font-family: Arial; text-align:center; padding-top:50px;">
-  <h1>dalaran.uy</h1>
-  <p>El sitio ya está funcionando 🚀</p>
+<body>
+  <header>
+    <div class="meta">
+      <span class="pill"><b>Origen</b> <span id="originLabel">—</span></span>
+      <span class="pill"><b>Endpoint</b> <span id="endpointLabel">—</span></span>
+      <span class="pill"><b>TAG</b> <span id="tagLabel">detectando…</span></span>
+      <span class="pill"><b>In-stock</b> <span id="count">0</span></span>
+      <span class="pill"><b>Status</b> <span id="status">Inicializando…</span></span>
+    </div>
+
+    <div class="row">
+      <input id="q" class="search" placeholder="Filtrar por nombre…" />
+      <span class="small muted">Precio:</span>
+      <input id="minP" class="num" type="number" inputmode="numeric" placeholder="mín" />
+      <input id="maxP" class="num" type="number" inputmode="numeric" placeholder="máx" />
+      <button id="clearPrice" class="btn" title="Limpiar rango">Limpiar</button>
+      <button id="sort" class="btn" title="Ordenar">Orden: <span id="sortMode">Relevancia</span></button>
+      <button id="exportCsv" class="btn" title="Descargar CSV del listado visible">Exportar CSV</button>
+      <button id="pause" class="btn" title="Pausar/Continuar descarga">Pausar</button>
+      <button id="stop" class="btn danger" title="Detener descarga (abort)">Detener</button>
+      <button id="top" class="btn">Ir arriba</button>
+    </div>
+
+    <div id="hint" class="muted" style="margin-top:8px">
+      Carga incremental: se muestran cards mientras se descargan páginas. Si activás filtros/orden durante la descarga, el listado se recalcula.
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div id="grid" class="grid"></div>
+    <div id="footer" class="muted small" style="padding:14px 2px 24px"></div>
+  </div>
+
+<script>
+(async () => {
+  const PER_PAGE = 100;
+
+  // === Config: destino WooCommerce
+  const base = "https://montevideogaminghouse.com";
+  const apiBase = `${base}/wp-json/wc/store/v1`;
+
+  const $ = (sel) => document.querySelector(sel);
+
+  $("#originLabel").textContent = base;
+  $("#endpointLabel").textContent = "/wp-json/wc/store/v1";
+
+  function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+  // ===== Helpers
+  function numericPriceFromProduct(p) {
+    const prices = p.prices || null;
+    if (prices && prices.price != null) {
+      const minor = Number.isFinite(+prices.currency_minor_unit)
+        ? +prices.currency_minor_unit
+        : 2;
+      const n = Number(prices.price);
+      if (Number.isFinite(n)) return n / Math.pow(10, minor);
+    }
+    const html = p.price_html || (prices && prices.price_html) || "";
+    if (html) {
+      const tmp = document.createElement("div");
+      tmp.innerHTML = html;
+      const text = (tmp.textContent || "").replace(/\s+/g, " ").trim();
+      const cleaned = text.replace(/[^\d,.\-]/g, "");
+      if (!cleaned) return NaN;
+      let num;
+      if (cleaned.includes(",") && cleaned.includes("."))
+        num = Number(cleaned.replace(/,/g, ""));
+      else if (cleaned.includes(",") && !cleaned.includes("."))
+        num = Number(cleaned.replace(/\./g, "").replace(",", "."));
+      else num = Number(cleaned);
+      return Number.isFinite(num) ? num : NaN;
+    }
+    return NaN;
+  }
+
+  function formatPrice(p) {
+    const prices = p.prices || null;
+    if (prices && prices.price_html) {
+      const tmp = document.createElement("div");
+      tmp.innerHTML = prices.price_html;
+      const text = tmp.textContent?.replace(/\s+/g, " ")?.trim();
+      if (text) return text;
+    }
+    if (p.price_html) {
+      const tmp = document.createElement("div");
+      tmp.innerHTML = p.price_html;
+      const text = tmp.textContent?.replace(/\s+/g, " ")?.trim();
+      if (text) return text;
+    }
+    if (prices) {
+      const currency = prices.currency_code || "USD";
+      const n = numericPriceFromProduct(p);
+      if (Number.isFinite(n)) {
+        try {
+          return new Intl.NumberFormat(undefined, { style: "currency", currency }).format(n);
+        } catch {
+          return `${currency} ${n}`;
+        }
+      }
+    }
+    return "";
+  }
+
+  async function fetchJson(url, signal) {
+    const r = await fetch(url, { cache: "no-store", signal });
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
+  }
+
+  async function fetchAll(path, signal) {
+    const out = [];
+    for (let page = 1; ; page++) {
+      const url = `${apiBase}${path}?per_page=${PER_PAGE}&page=${page}`;
+      const j = await fetchJson(url, signal);
+      if (!Array.isArray(j) || j.length === 0) break;
+      out.push(...j);
+      if (j.length < PER_PAGE) break;
+    }
+    return out;
+  }
+
+  // ===== Detect TAG Juegos de Mesa (fallback 17)
+  let tagId = 17;
+  let tagName = "Juegos de Mesa";
+  try {
+    $("#status").textContent = "Detectando TAG…";
+    const tags = await fetchAll("/products/tags");
+    const cand = tags.find((t) => {
+      const n = String(t.name || "").toLowerCase();
+      const s = String(t.slug || "").toLowerCase();
+      return (
+        n.includes("juegos de mesa") ||
+        s.includes("juegos-de-mesa") ||
+        s.startsWith("juegos-de-m")
+      );
+    });
+    if (cand) {
+      tagId = cand.id;
+      tagName = cand.name || tagName;
+    }
+  } catch (e) {
+    $("#hint").innerHTML = `<span class="err">No pude listar tags; uso fallback id=17.</span>`;
+  }
+  $("#tagLabel").textContent = `${tagName} (id ${tagId})`;
+
+  // ===== Estado + Abort/Pause
+  let paused = false;
+  let stopped = false;
+  const controller = new AbortController();
+
+  $("#pause").addEventListener("click", () => {
+    paused = !paused;
+    $("#pause").textContent = paused ? "Continuar" : "Pausar";
+    $("#status").textContent = paused ? "Pausado" : "Descargando…";
+  });
+
+  $("#stop").addEventListener("click", () => {
+    stopped = true;
+    try { controller.abort(); } catch {}
+    $("#status").textContent = "Detenido";
+    $("#hint").innerHTML = `<span class="err">Descarga detenida.</span>`;
+  });
+
+  $("#top").addEventListener("click", () =>
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  );
+
+  // ===== Render infra
+  const grid = $("#grid");
+  const footer = $("#footer");
+  const renderedIds = new Set();
+
+  function buildCard(p) {
+    const a = document.createElement("a");
+    a.className = "card";
+    a.href = p.link;
+    a.target = "_blank";
+    a.rel = "noopener";
+
+    const thumb = document.createElement("div");
+    thumb.className = "thumb";
+
+    if (p.image) {
+      const img = document.createElement("img");
+      img.src = p.image;
+      img.alt = p.name;
+      img.loading = "lazy";
+      thumb.appendChild(img);
+    } else {
+      const div = document.createElement("div");
+      div.className = "muted";
+      div.textContent = "Sin imagen";
+      thumb.appendChild(div);
+    }
+
+    const body = document.createElement("div");
+    body.className = "body";
+
+    const name = document.createElement("div");
+    name.className = "name";
+    name.textContent = p.name;
+
+    const price = document.createElement("div");
+    price.className = "price";
+    price.textContent = p.priceText || "";
+
+    body.appendChild(name);
+    body.appendChild(price);
+
+    a.appendChild(thumb);
+    a.appendChild(body);
+    return a;
+  }
+
+  function appendCards(list) {
+    const frag = document.createDocumentFragment();
+    let added = 0;
+    for (const p of list) {
+      if (renderedIds.has(p.id)) continue;
+      renderedIds.add(p.id);
+      frag.appendChild(buildCard(p));
+      added++;
+    }
+    if (added) grid.appendChild(frag);
+    footer.textContent = `Mostrando ${grid.childElementCount} producto(s).`;
+  }
+
+  function clearGrid() {
+    grid.innerHTML = "";
+    renderedIds.clear();
+  }
+
+  // ===== Datos
+  const all = [];
+
+  // ===== Filtros + sort
+  let sortMode = "relevancia"; // relevancia | precio_asc | precio_desc
+
+  function getMinMaxInputs() {
+    const minRaw = ($("#minP").value || "").trim();
+    const maxRaw = ($("#maxP").value || "").trim();
+    const min = minRaw === "" ? null : Number(minRaw);
+    const max = maxRaw === "" ? null : Number(maxRaw);
+    return {
+      min: Number.isFinite(min) ? min : null,
+      max: Number.isFinite(max) ? max : null,
+    };
+  }
+
+  function getFilteredAndSortedList() {
+    const q = ($("#q").value || "").trim().toLowerCase();
+    const { min, max } = getMinMaxInputs();
+    let list = all;
+
+    if (q) list = list.filter((p) => p.name.toLowerCase().includes(q));
+
+    if (min != null || max != null) {
+      list = list.filter((p) => {
+        const v = p.priceValue;
+        if (!Number.isFinite(v)) return false;
+        if (min != null && v < min) return false;
+        if (max != null && v > max) return false;
+        return true;
+      });
+    }
+
+    if (sortMode === "precio_asc") {
+      list = [...list].sort((a, b) => {
+        const av = Number.isFinite(a.priceValue) ? a.priceValue : Infinity;
+        const bv = Number.isFinite(b.priceValue) ? b.priceValue : Infinity;
+        return av - bv;
+      });
+    } else if (sortMode === "precio_desc") {
+      list = [...list].sort((a, b) => {
+        const av = Number.isFinite(a.priceValue) ? a.priceValue : -Infinity;
+        const bv = Number.isFinite(b.priceValue) ? b.priceValue : -Infinity;
+        return bv - av;
+      });
+    }
+
+    return list;
+  }
+
+  function applyFullRender() {
+    const list = getFilteredAndSortedList();
+    clearGrid();
+    appendCards(list);
+    footer.textContent = `Mostrando ${list.length} producto(s).`;
+  }
+
+  let tApply = null;
+  function applyDebounced() {
+    if (tApply) clearTimeout(tApply);
+    tApply = setTimeout(() => applyFullRender(), 150);
+  }
+
+  $("#q").addEventListener("input", applyDebounced);
+  $("#q").addEventListener("keyup", applyDebounced);
+  $("#q").addEventListener("change", applyDebounced);
+  $("#minP").addEventListener("input", applyDebounced);
+  $("#maxP").addEventListener("input", applyDebounced);
+
+  $("#clearPrice").addEventListener("click", () => {
+    $("#minP").value = "";
+    $("#maxP").value = "";
+    applyFullRender();
+  });
+
+  $("#sort").addEventListener("click", () => {
+    sortMode =
+      sortMode === "relevancia"
+        ? "precio_asc"
+        : sortMode === "precio_asc"
+        ? "precio_desc"
+        : "relevancia";
+
+    $("#sortMode").textContent =
+      sortMode === "relevancia" ? "Relevancia" : sortMode === "precio_asc" ? "Precio ↑" : "Precio ↓";
+
+    applyFullRender();
+  });
+
+  function csvEscape(v) {
+    const s = String(v ?? "");
+    return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+  }
+
+  $("#exportCsv").addEventListener("click", () => {
+    const list = getFilteredAndSortedList();
+    const header = ["name", "price_text", "price_value", "url"].join(",");
+    const rows = list.map((p) =>
+      [csvEscape(p.name), csvEscape(p.priceText), csvEscape(Number.isFinite(p.priceValue) ? p.priceValue : ""), csvEscape(p.link)].join(",")
+    );
+    const csv = [header, ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `mgh_${tagId}_instock_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1500);
+  });
+
+  // ===== Descarga incremental
+  $("#status").textContent = "Descargando…";
+  $("#count").textContent = "0";
+  document.title = `Cargando ${tagName}…`;
+
+  try {
+    for (let page = 1; ; page++) {
+      while (paused && !stopped) await sleep(200);
+      if (stopped) break;
+
+      const url = `${apiBase}/products?per_page=${PER_PAGE}&page=${page}&stock_status=instock&tag=${encodeURIComponent(tagId)}`;
+      const data = await fetchJson(url, controller.signal);
+
+      if (!Array.isArray(data) || data.length === 0) break;
+
+      const newItems = [];
+      for (const p of data) {
+        const image =
+          (p.images && p.images[0] && (p.images[0].src || p.images[0].thumbnail)) || "";
+        const numericPrice = numericPriceFromProduct(p);
+
+        const item = {
+          id: p.id,
+          name: p.name || "(sin nombre)",
+          link: p.permalink || "#",
+          image,
+          priceText: formatPrice(p),
+          priceValue: numericPrice,
+        };
+
+        all.push(item);
+        newItems.push(item);
+      }
+
+      $("#count").textContent = String(all.length);
+      $("#status").textContent = `Descargando… (pág ${page})`;
+      document.title = `${tagName} in-stock (${all.length}) — cargando…`;
+
+      const q = ($("#q").value || "").trim();
+      const { min, max } = getMinMaxInputs();
+      const hasFilters = !!q || min != null || max != null;
+      const hasSort = sortMode !== "relevancia";
+
+      if (!hasFilters && !hasSort) {
+        appendCards(newItems);
+      } else {
+        footer.textContent = `Descargados ${all.length} producto(s). (Filtrado/orden activo)`;
+      }
+
+      if (data.length < PER_PAGE) break;
+    }
+  } catch (e) {
+    if (!stopped) {
+      console.warn("Error descarga:", e);
+      $("#hint").innerHTML = `<span class="err">Error durante la descarga. Probá recargar.</span>`;
+      $("#status").textContent = "Error";
+    }
+  }
+
+  if (!stopped) {
+    $("#status").textContent = "Listo";
+    $("#hint").innerHTML = `<span class="ok">✅ Listo:</span> ${all.length} productos in-stock con tag=${tagId} (${tagName}).`;
+  }
+  document.title = `${tagName} in-stock (${all.length})`;
+
+  // Asegurar render correcto si había filtros/sort activos
+  applyFullRender();
+})();
+</script>
 </body>
 </html>
