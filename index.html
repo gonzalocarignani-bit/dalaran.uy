@@ -30,6 +30,64 @@
     .small{font-size:12px;opacity:.8}
     .err{color:#ffb3b3}
     .ok{color:#b6ffcc}
+    /* ===== MOBILE OPTIMIZATION ===== */
+@media (max-width: 600px) {
+
+  header {
+    padding: 10px 12px;
+  }
+
+  .meta {
+    gap: 6px;
+  }
+
+  .pill {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+
+  .row {
+    gap: 6px;
+  }
+
+  .search {
+    min-width: 0;
+    max-width: 100%;
+    flex: 1 1 100%;
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+
+  .num {
+    width: 80px;
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+
+  .btn {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+
+  .card {
+    min-height: 250px;
+  }
+
+  .name {
+    font-size: 12px;
+  }
+
+  .price {
+    font-size: 13px;
+  }
+}
+
+    
   </style>
 </head>
 <body>
