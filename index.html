@@ -35,7 +35,8 @@
 <body>
   <header>
     <div class="meta">
-      <span class="pill"><b>Origen</b> <span id="originLabel">—</span></span>
+      <span class="pill"><b>Destino</b> <span id="originLabel">—</span></span>
+      <span class="pill"><b>Proxy</b> <span id="proxyLabel">—</span></span>
       <span class="pill"><b>Endpoint</b> <span id="endpointLabel">—</span></span>
       <span class="pill"><b>TAG</b> <span id="tagLabel">detectando…</span></span>
       <span class="pill"><b>In-stock</b> <span id="count">0</span></span>
@@ -69,24 +70,24 @@
 (async () => {
   const PER_PAGE = 100;
 
-  // === Config: destino WooCommerce
-  const base = "https://dalaran-proxy.gonzalo-carignani.workers.dev";
-const apiBase = `${base}/api`;
+  // === Config: Proxy + destino WooCommerce
+  const PROXY_BASE = "https://dalaran-proxy.gonzalo-carignani.workers.dev";
+  const apiBase = `${PROXY_BASE}/api`; // Worker expone /api/* -> wc/store/v1/*
+
+  const DESTINO = "https://montevideogaminghouse.com"; // solo para mostrar
 
   const $ = (sel) => document.querySelector(sel);
-
-  $("#originLabel").textContent = base;
-  $("#endpointLabel").textContent = "/wp-json/wc/store/v1";
-
   function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+  $("#originLabel").textContent = DESTINO;
+  $("#proxyLabel").textContent = PROXY_BASE;
+  $("#endpointLabel").textContent = "/api → /wp-json/wc/store/v1";
 
   // ===== Helpers
   function numericPriceFromProduct(p) {
     const prices = p.prices || null;
     if (prices && prices.price != null) {
-      const minor = Number.isFinite(+prices.currency_minor_unit)
-        ? +prices.currency_minor_unit
-        : 2;
+      const minor = Number.isFinite(+prices.currency_minor_unit) ? +prices.currency_minor_unit : 2;
       const n = Number(prices.price);
       if (Number.isFinite(n)) return n / Math.pow(10, minor);
     }
@@ -98,10 +99,8 @@ const apiBase = `${base}/api`;
       const cleaned = text.replace(/[^\d,.\-]/g, "");
       if (!cleaned) return NaN;
       let num;
-      if (cleaned.includes(",") && cleaned.includes("."))
-        num = Number(cleaned.replace(/,/g, ""));
-      else if (cleaned.includes(",") && !cleaned.includes("."))
-        num = Number(cleaned.replace(/\./g, "").replace(",", "."));
+      if (cleaned.includes(",") && cleaned.includes(".")) num = Number(cleaned.replace(/,/g, ""));
+      else if (cleaned.includes(",") && !cleaned.includes(".")) num = Number(cleaned.replace(/\./g, "").replace(",", "."));
       else num = Number(cleaned);
       return Number.isFinite(num) ? num : NaN;
     }
@@ -126,11 +125,8 @@ const apiBase = `${base}/api`;
       const currency = prices.currency_code || "USD";
       const n = numericPriceFromProduct(p);
       if (Number.isFinite(n)) {
-        try {
-          return new Intl.NumberFormat(undefined, { style: "currency", currency }).format(n);
-        } catch {
-          return `${currency} ${n}`;
-        }
+        try { return new Intl.NumberFormat(undefined, { style: "currency", currency }).format(n); }
+        catch { return `${currency} ${n}`; }
       }
     }
     return "";
@@ -138,7 +134,7 @@ const apiBase = `${base}/api`;
 
   async function fetchJson(url, signal) {
     const r = await fetch(url, { cache: "no-store", signal });
-    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    if (!r.ok) throw new Error(`HTTP ${r.status} ${r.statusText}`);
     return r.json();
   }
 
@@ -153,30 +149,6 @@ const apiBase = `${base}/api`;
     }
     return out;
   }
-
-  // ===== Detect TAG Juegos de Mesa (fallback 17)
-  let tagId = 17;
-  let tagName = "Juegos de Mesa";
-  try {
-    $("#status").textContent = "Detectando TAG…";
-    const tags = await fetchAll("/products/tags");
-    const cand = tags.find((t) => {
-      const n = String(t.name || "").toLowerCase();
-      const s = String(t.slug || "").toLowerCase();
-      return (
-        n.includes("juegos de mesa") ||
-        s.includes("juegos-de-mesa") ||
-        s.startsWith("juegos-de-m")
-      );
-    });
-    if (cand) {
-      tagId = cand.id;
-      tagName = cand.name || tagName;
-    }
-  } catch (e) {
-    $("#hint").innerHTML = `<span class="err">No pude listar tags; uso fallback id=17.</span>`;
-  }
-  $("#tagLabel").textContent = `${tagName} (id ${tagId})`;
 
   // ===== Estado + Abort/Pause
   let paused = false;
@@ -200,7 +172,7 @@ const apiBase = `${base}/api`;
     window.scrollTo({ top: 0, behavior: "smooth" })
   );
 
-  // ===== Render infra
+  // ===== Infra render
   const grid = $("#grid");
   const footer = $("#footer");
   const renderedIds = new Set();
@@ -276,10 +248,7 @@ const apiBase = `${base}/api`;
     const maxRaw = ($("#maxP").value || "").trim();
     const min = minRaw === "" ? null : Number(minRaw);
     const max = maxRaw === "" ? null : Number(maxRaw);
-    return {
-      min: Number.isFinite(min) ? min : null,
-      max: Number.isFinite(max) ? max : null,
-    };
+    return { min: Number.isFinite(min) ? min : null, max: Number.isFinite(max) ? max : null };
   }
 
   function getFilteredAndSortedList() {
@@ -343,14 +312,14 @@ const apiBase = `${base}/api`;
 
   $("#sort").addEventListener("click", () => {
     sortMode =
-      sortMode === "relevancia"
-        ? "precio_asc"
-        : sortMode === "precio_asc"
-        ? "precio_desc"
-        : "relevancia";
+      sortMode === "relevancia" ? "precio_asc" :
+      sortMode === "precio_asc" ? "precio_desc" :
+      "relevancia";
 
     $("#sortMode").textContent =
-      sortMode === "relevancia" ? "Relevancia" : sortMode === "precio_asc" ? "Precio ↑" : "Precio ↓";
+      sortMode === "relevancia" ? "Relevancia" :
+      sortMode === "precio_asc" ? "Precio ↑" :
+      "Precio ↓";
 
     applyFullRender();
   });
@@ -371,12 +340,51 @@ const apiBase = `${base}/api`;
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `mgh_${tagId}_instock_${new Date().toISOString().slice(0, 10)}.csv`;
+    a.download = `mgh_tag_${tagId}_instock_${new Date().toISOString().slice(0, 10)}.csv`;
     document.body.appendChild(a);
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 1500);
   });
+
+  // ===== TAG: fallback correcto (75) + detección si se puede
+  let tagId = 75;               // ✅ fallback correcto según tu JSON
+  let tagName = "Juegos de Mesa";
+
+  try {
+    $("#status").textContent = "Detectando TAG…";
+    const tags = await fetchAll("/products/tags", controller.signal);
+    const cand = tags.find((t) => {
+      const n = String(t.name || "").toLowerCase();
+      const s = String(t.slug || "").toLowerCase();
+      return (
+        n.includes("juegos de mesa") ||
+        s.includes("juegos-de-mesa") ||
+        s.startsWith("juegos-de-m")
+      );
+    });
+    if (cand) {
+      tagId = cand.id;
+      tagName = cand.name || tagName;
+    }
+  } catch (e) {
+    // si falla, seguimos con fallback 75
+    console.warn("No pude listar tags, uso fallback:", e);
+    $("#hint").innerHTML = `<span class="err">No pude listar tags; uso fallback id=${tagId}.</span>`;
+  }
+
+  $("#tagLabel").textContent = `${tagName} (id ${tagId})`;
+
+  // ===== Test rápido de API vía proxy (si falla, cortamos con mensaje)
+  try {
+    $("#status").textContent = "Probando API…";
+    await fetchJson(`${apiBase}/products?per_page=1`, controller.signal);
+  } catch (e) {
+    $("#status").textContent = "Error API";
+    $("#hint").innerHTML = `<span class="err">No puedo leer el API vía proxy. Revisá que el Worker esté deployado y que /api/products responda.</span>`;
+    console.error(e);
+    return;
+  }
 
   // ===== Descarga incremental
   $("#status").textContent = "Descargando…";
@@ -441,10 +449,13 @@ const apiBase = `${base}/api`;
     $("#status").textContent = "Listo";
     $("#hint").innerHTML = `<span class="ok">✅ Listo:</span> ${all.length} productos in-stock con tag=${tagId} (${tagName}).`;
   }
+
   document.title = `${tagName} in-stock (${all.length})`;
 
   // Asegurar render correcto si había filtros/sort activos
   applyFullRender();
+
+  console.log(`✅ Listo: ${all.length} productos in-stock con tag=${tagId} (${tagName}).`);
 })();
 </script>
 </body>
