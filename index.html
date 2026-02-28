@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dalaran — Juegos de Mesa en Montevideo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:       #05060a;
+      --bg2:      #0a0c12;
+      --bg3:      #0f1219;
+      --border:   rgba(255,255,255,.06);
+      --border2:  rgba(255,255,255,.11);
+      --gold:     #c9a84c;
+      --gold2:    #e8c96a;
+      --gold-dim: rgba(201,168,76,.12);
+      --gold-glow:rgba(201,168,76,.2);
+      --text:     #f0ece4;
+      --muted:    rgba(240,236,228,.45);
+      --muted2:   rgba(240,236,228,.25);
+      --red:      #e05555;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+      opacity: .03;
+      pointer-events: none;
+      z-index: 9999;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: -20%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 500px;
+      background: radial-gradient(ellipse, rgba(201,168,76,.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(5,6,10,.85);
+      backdrop-filter: blur(24px) saturate(160%);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-inner { max-width: 1400px; margin: 0 auto; padding: 0 32px; }
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 0 14px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .logo-wrap { display: flex; flex-direction: column; gap: 2px; }
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-weight: 900;
+      font-size: 26px;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      display: flex;
+      align-items: baseline;
+      gap: 0;
+      line-height: 1;
+    }
+    .logo-accent { color: var(--gold); font-style: italic; }
+    .logo-tagline {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+    .header-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .stat-pill {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border: 1px solid var(--border2);
+      border-radius: 999px;
+      background: rgba(255,255,255,.03);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .stat-pill .label { color: var(--muted); }
+    .stat-pill .val   { color: var(--gold); font-weight: 600; }
+    .live-dot {
+      width: 6px; height: 6px;
+      background: var(--gold);
+      border-radius: 50%;
+      animation: ripple 2s ease-in-out infinite;
+    }
+    @keyframes ripple {
+      0%   { box-shadow: 0 0 0 0 rgba(201,168,76,.6); }
+      70%  { box-shadow: 0 0 0 6px rgba(201,168,76,0); }
+      100% { box-shadow: 0 0 0 0 rgba(201,168,76,0); }
+    }
+    .controls-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0 0 14px;
+      flex-wrap: wrap;
+    }
+    .search-wrap { flex: 1; min-width: 220px; max-width: 420px; position: relative; }
+    .search-icon {
+      position: absolute;
+      left: 14px; top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      font-size: 15px;
+      pointer-events: none;
+    }
+    .search {
+      width: 100%;
+      padding: 10px 14px 10px 38px;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .search:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--gold-dim); }
+    .search::placeholder { color: var(--muted); }
+    .price-range { display: flex; align-items: center; gap: 6px; }
+    .price-range .sep { color: var(--muted2); font-size: 12px; }
+    .num {
+      width: 90px;
+      padding: 10px;
+      background: var(--bg3);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      font-size: 13px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .num:focus { border-color: var(--gold); }
+    .num::placeholder { color: var(--muted); }
+    .btn {
+      cursor: pointer;
+      border: 1px solid var(--border2);
+      background: rgba(255,255,255,.04);
+      color: var(--text);
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: all .18s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:hover { background: rgba(255,255,255,.08); }
+    .btn.gold  { background: var(--gold-dim); border-color: rgba(201,168,76,.3); color: var(--gold); }
+    .btn.gold:hover { background: rgba(201,168,76,.2); }
+    .btn.danger:hover { background: rgba(224,85,85,.1); color: var(--red); border-color: rgba(224,85,85,.3); }
+    .hero {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 32px 0;
+      position: relative;
+      z-index: 1;
+    }
+    .hero-text {
+      display: flex;
+      align-items: flex-end;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: clamp(32px, 5vw, 56px);
+      line-height: 1.05;
+      letter-spacing: -1px;
+      color: var(--text);
+    }
+    .hero-title em { font-style: italic; color: var(--gold); }
+    .hero-sub {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 300;
+      max-width: 300px;
+      line-height: 1.65;
+      padding-bottom: 6px;
+    }
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, var(--gold) 0%, rgba(201,168,76,.1) 50%, transparent 100%);
+      margin-bottom: 24px;
+    }
+    .status-bar {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 32px 14px;
+      font-size: 12px;
+      color: var(--muted);
+      position: relative;
+      z-index: 1;
+    }
+    #hint.ok  { color: var(--gold); }
+    #hint.err { color: var(--red); }
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 32px 60px;
+      position: relative;
+      z-index: 1;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      display: block;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      transition: transform .22s cubic-bezier(.25,.46,.45,.94), border-color .22s, box-shadow .22s;
+      animation: fadeUp .4s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .card:hover {
+      transform: translateY(-4px) scale(1.01);
+      border-color: rgba(201,168,76,.35);
+      box-shadow: 0 12px 40px rgba(0,0,0,.5), 0 0 0 1px rgba(201,168,76,.1);
+    }
+    .thumb {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      background: var(--bg3);
+      overflow: hidden;
+      position: relative;
+    }
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 12px;
+      transition: transform .35s cubic-bezier(.25,.46,.45,.94);
+    }
+    .card:hover .thumb img { transform: scale(1.06); }
+    .thumb-empty {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      opacity: .15;
+    }
+    .card-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(5,6,10,.95) 0%, rgba(5,6,10,.3) 45%, transparent 100%);
+      opacity: 0;
+      transition: opacity .25s;
+      display: flex;
+      align-items: flex-end;
+      padding: 14px;
+    }
+    .card:hover .card-overlay { opacity: 1; }
+    .card-cta {
+      width: 100%;
+      padding: 8px 12px;
+      background: var(--gold);
+      color: #05060a;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      text-align: center;
+    }
+    .card-body { padding: 12px 14px 14px; }
+    .card-name {
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1.3;
+      color: var(--text);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+    .card-price {
+      font-family: 'Playfair Display', serif;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: -.3px;
+    }
+    @keyframes shimmer {
+      0%   { background-position: -600px 0; }
+      100% { background-position:  600px 0; }
+    }
+    .skeleton {
+      border-radius: 16px;
+      background: linear-gradient(90deg, var(--bg2) 25%, var(--bg3) 50%, var(--bg2) 75%);
+      background-size: 1200px 100%;
+      animation: shimmer 1.6s infinite linear;
+      aspect-ratio: 1.1;
+    }
+    .empty {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 80px 20px;
+      color: var(--muted);
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty p { font-size: 14px; line-height: 1.6; }
+    .footer-count { padding: 20px 0 0; font-size: 12px; color: var(--muted2); text-align: center; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(201,168,76,.3); }
+    @media (max-width: 640px) {
+      .header-inner { padding: 0 16px; }
+      .hero { padding: 24px 16px 0; }
+      .status-bar { padding: 0 16px 12px; }
+      main { padding: 0 16px 40px; }
+      .logo { font-size: 22px; }
+      .hero-title { font-size: 28px; }
+      .search-wrap { max-width: 100%; }
+      .num { width: 74px; }
+      .grid { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-top">
+      <div class="logo-wrap">
+        <div class="logo">Dala<span class="logo-accent">ran</span></div>
+        <div class="logo-tagline">Juegos de Mesa &middot; Montevideo</div>
+      </div>
+      <div class="header-right">
+        <div class="stat-pill">
+          <div class="live-dot"></div>
+          <span class="label">In-stock</span>
+          <span class="val" id="countTotal">&mdash;</span>
+        </div>
+        <div class="stat-pill">
+          <span class="label">MGH</span>
+          <span class="val" id="countMGH">cargando&hellip;</span>
+        </div>
+      </div>
+    </div>
+    <div class="controls-row">
+      <div class="search-wrap">
+        <span class="search-icon">&#8981;</span>
+        <input id="q" class="search" placeholder="Buscar juego&hellip;" autocomplete="off" />
+      </div>
+      <div class="price-range">
+        <input id="minP" class="num" type="number" inputmode="numeric" placeholder="$ m&iacute;n" />
+        <span class="sep">&mdash;</span>
+        <input id="maxP" class="num" type="number" inputmode="numeric" placeholder="$ m&aacute;x" />
+        <button id="clearPrice" class="btn" title="Limpiar">&#10005;</button>
+      </div>
+      <button id="sort" class="btn">&#8597; <span id="sortLabel">Relevancia</span></button>
+      <button id="exportCsv" class="btn gold">&#8595; CSV</button>
+      <button id="stop" class="btn danger">&#9632;</button>
+      <button id="top" class="btn">&#8593;</button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-text">
+    <h1 class="hero-title">Cat&aacute;logo<br><em>completo</em></h1>
+    <p class="hero-sub">Todos los juegos disponibles en Montevideo Gaming House, actualizados en tiempo real.</p>
+  </div>
+  <div class="divider"></div>
+</section>
+
+<div class="status-bar">
+  <span id="hint">Conectando con la tienda&hellip;</span>
+</div>
+
+<main>
+  <div id="grid" class="grid"></div>
+  <div id="footer" class="footer-count"></div>
+</main>
+
+<script>
+(async () => {
+  const PER_PAGE   = 100;
+  const PROXY_BASE = "https://dalaran-proxy.gonzalo-carignani.workers.dev";
+  const apiBase    = PROXY_BASE + "/api";
+  const $ = s => document.querySelector(s);
+
+  let stopped = false;
+  let sortMode = "relevancia";
+  let allItems = [];
+  const controller = new AbortController();
+
+  function numericPrice(p) {
+    const pr = p.prices;
+    if (pr && pr.price != null) {
+      const minor = isFinite(+pr.currency_minor_unit) ? +pr.currency_minor_unit : 2;
+      const n = Number(pr.price);
+      if (isFinite(n)) return n / Math.pow(10, minor);
+    }
+    const html = p.price_html || (pr && pr.price_html) || "";
+    if (html) {
+      const tmp = document.createElement("div");
+      tmp.innerHTML = html;
+      const text = tmp.textContent.replace(/\s+/g, " ").trim();
+      const cleaned = text.replace(/[^\d,\.\-]/g, "");
+      if (!cleaned) return NaN;
+      let num;
+      if (cleaned.includes(",") && cleaned.includes(".")) num = Number(cleaned.replace(/,/g, ""));
+      else if (cleaned.includes(",")) num = Number(cleaned.replace(/\./g, "").replace(",", "."));
+      else num = Number(cleaned);
+      return isFinite(num) ? num : NaN;
+    }
+    return NaN;
+  }
+
+  function formatPrice(p) {
+    const pr = p.prices;
+    const htmlSrc = (pr && pr.price_html) || p.price_html || "";
+    if (htmlSrc) {
+      const tmp = document.createElement("div");
+      tmp.innerHTML = htmlSrc;
+      const t = tmp.textContent && tmp.textContent.replace(/\s+/g, " ").trim();
+      if (t) return t;
+    }
+    if (pr) {
+      const currency = pr.currency_code || "UYU";
+      const n = numericPrice(p);
+      if (isFinite(n)) {
+        try { return new Intl.NumberFormat("es-UY", { style: "currency", currency }).format(n); }
+        catch(e) { return currency + " " + n; }
+      }
+    }
+    return "";
+  }
+
+  function normalizeItem(p) {
+    const img = p.images && p.images[0];
+    const image = (img && (img.src || img.thumbnail)) || "";
+    return {
+      id:         p.id,
+      name:       p.name || "(sin nombre)",
+      link:       p.permalink || "#",
+      image:      image,
+      priceText:  formatPrice(p),
+      priceValue: numericPrice(p),
+    };
+  }
+
+  async function fetchJson(url, signal) {
+    const r = await fetch(url, { cache: "no-store", signal: signal });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    return r.json();
+  }
+
+  $("#stop").addEventListener("click", function() {
+    stopped = true;
+    try { controller.abort(); } catch(e) {}
+    $("#hint").textContent = "Carga detenida.";
+  });
+
+  $("#top").addEventListener("click", function() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+
+  $("#clearPrice").addEventListener("click", function() {
+    $("#minP").value = "";
+    $("#maxP").value = "";
+    renderGrid();
+  });
+
+  ["input","change"].forEach(function(ev) {
+    $("#q").addEventListener(ev, renderGrid);
+    $("#minP").addEventListener(ev, renderGrid);
+    $("#maxP").addEventListener(ev, renderGrid);
+  });
+
+  var sortModes = ["relevancia","precio_asc","precio_desc"];
+  var sortLabels = { relevancia: "Relevancia", precio_asc: "Precio \u2191", precio_desc: "Precio \u2193" };
+  $("#sort").addEventListener("click", function() {
+    var i = sortModes.indexOf(sortMode);
+    sortMode = sortModes[(i + 1) % sortModes.length];
+    $("#sortLabel").textContent = sortLabels[sortMode];
+    renderGrid();
+  });
+
+  $("#exportCsv").addEventListener("click", function() {
+    var rows = [["Nombre","Precio","URL"]];
+    getFiltered().forEach(function(p) { rows.push(['"' + p.name + '"', p.priceText, p.link]); });
+    var csv = rows.map(function(r) { return r.join(","); }).join("\n");
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+    a.download = "dalaran-productos.csv";
+    a.click();
+  });
+
+  function getFiltered() {
+    var q = ($("#q").value || "").trim().toLowerCase();
+    var minV = parseFloat($("#minP").value);
+    var maxV = parseFloat($("#maxP").value);
+    var list = allItems.slice();
+    if (q) list = list.filter(function(p) { return p.name.toLowerCase().includes(q); });
+    if (isFinite(minV)) list = list.filter(function(p) { return isFinite(p.priceValue) && p.priceValue >= minV; });
+    if (isFinite(maxV)) list = list.filter(function(p) { return isFinite(p.priceValue) && p.priceValue <= maxV; });
+    if (sortMode === "precio_asc")  list.sort(function(a,b) { return (isFinite(a.priceValue)?a.priceValue:Infinity)-(isFinite(b.priceValue)?b.priceValue:Infinity); });
+    if (sortMode === "precio_desc") list.sort(function(a,b) { return (isFinite(b.priceValue)?b.priceValue:-Infinity)-(isFinite(a.priceValue)?a.priceValue:-Infinity); });
+    return list;
+  }
+
+  function buildCard(p, delay) {
+    var a = document.createElement("a");
+    a.className = "card";
+    a.href = p.link;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.style.animationDelay = (delay * 25) + "ms";
+
+    var thumb = document.createElement("div");
+    thumb.className = "thumb";
+
+    if (p.image) {
+      var img = document.createElement("img");
+      img.src = p.image;
+      img.alt = p.name;
+      img.loading = "lazy";
+      img.onerror = function() {
+        img.remove();
+        var empty = document.createElement("div");
+        empty.className = "thumb-empty";
+        empty.textContent = "\uD83C\uDFB2";
+        thumb.appendChild(empty);
+      };
+      thumb.appendChild(img);
+    } else {
+      var empty = document.createElement("div");
+      empty.className = "thumb-empty";
+      empty.textContent = "\uD83C\uDFB2";
+      thumb.appendChild(empty);
+    }
+
+    var overlay = document.createElement("div");
+    overlay.className = "card-overlay";
+    var cta = document.createElement("div");
+    cta.className = "card-cta";
+    cta.textContent = "Ver en MGH \u2192";
+    overlay.appendChild(cta);
+    thumb.appendChild(overlay);
+
+    var body = document.createElement("div");
+    body.className = "card-body";
+    var name = document.createElement("div");
+    name.className = "card-name";
+    name.textContent = p.name;
+    var price = document.createElement("div");
+    price.className = "card-price";
+    price.textContent = p.priceText || "";
+    body.appendChild(name);
+    body.appendChild(price);
+    a.appendChild(thumb);
+    a.appendChild(body);
+    return a;
+  }
+
+  var gridEl   = $("#grid");
+  var footerEl = $("#footer");
+
+  function renderGrid() {
+    var list = getFiltered();
+    gridEl.innerHTML = "";
+    if (list.length === 0 && allItems.length > 0) {
+      var empty = document.createElement("div");
+      empty.className = "empty";
+      empty.innerHTML = '<div class="empty-icon">\uD83D\uDD0D</div><p>No hay juegos que coincidan.</p>';
+      gridEl.appendChild(empty);
+      footerEl.textContent = "";
+      return;
+    }
+    var frag = document.createDocumentFragment();
+    list.forEach(function(p, i) { frag.appendChild(buildCard(p, i)); });
+    gridEl.appendChild(frag);
+    footerEl.textContent = list.length + " producto" + (list.length !== 1 ? "s" : "") + " encontrado" + (list.length !== 1 ? "s" : "");
+  }
+
+  function addSkeletons(n) {
+    var frag = document.createDocumentFragment();
+    for (var i = 0; i < n; i++) {
+      var s = document.createElement("div");
+      s.className = "skeleton";
+      frag.appendChild(s);
+    }
+    gridEl.appendChild(frag);
+  }
+
+  function removeSkeletons() {
+    gridEl.querySelectorAll(".skeleton").forEach(function(s) { s.remove(); });
+  }
+
+  addSkeletons(18);
+
+  var tagId = 0;
+  try {
+    var tags = await fetchJson(apiBase + "/products/tags?per_page=100", controller.signal);
+    var tag = tags.find(function(t) {
+      var n = String(t.name || "").toLowerCase();
+      var s = String(t.slug || "").toLowerCase();
+      return n.includes("juegos de mesa") || s.includes("juegos-de-mesa");
+    });
+    if (tag) tagId = tag.id;
+  } catch(e) {}
+
+  var tagParam = tagId ? "&tag=" + tagId : "";
+
+  for (var page = 1; !stopped; page++) {
+    try {
+      var url = apiBase + "/products?per_page=" + PER_PAGE + "&page=" + page + "&stock_status=instock" + tagParam;
+      var data = await fetchJson(url, controller.signal);
+      if (!Array.isArray(data) || data.length === 0) break;
+
+      var items = data.map(normalizeItem);
+      allItems = allItems.concat(items);
+
+      $("#countMGH").textContent   = allItems.length;
+      $("#countTotal").textContent = allItems.length;
+      $("#hint").textContent       = "Cargando\u2026 " + allItems.length + " productos";
+
+      if (page === 1) {
+        removeSkeletons();
+        renderGrid();
+      } else {
+        var q = ($("#q").value || "").trim();
+        var minV = parseFloat($("#minP").value);
+        var maxV = parseFloat($("#maxP").value);
+        var hasFilter = q || isFinite(minV) || isFinite(maxV) || sortMode !== "relevancia";
+        if (!hasFilter) {
+          var frag2 = document.createDocumentFragment();
+          items.forEach(function(p, i) { frag2.appendChild(buildCard(p, i)); });
+          gridEl.appendChild(frag2);
+          footerEl.textContent = allItems.length + " productos encontrados";
+        } else {
+          renderGrid();
+        }
+      }
+      if (data.length < PER_PAGE) break;
+    } catch(e) {
+      if (!stopped) {
+        removeSkeletons();
+        if (allItems.length === 0) {
+          gridEl.innerHTML = '<div class="empty"><div class="empty-icon">\u26A0\uFE0F</div><p>No se pudo conectar con la tienda.</p></div>';
+        }
+        $("#hint").textContent = "Error de conexi\u00f3n.";
+        $("#hint").className = "err";
+      }
+      break;
+    }
+  }
+
+  if (!stopped) {
+    $("#countMGH").textContent   = allItems.length;
+    $("#countTotal").textContent = allItems.length;
+    $("#hint").textContent = "\u2713 " + allItems.length + " productos in-stock cargados desde Montevideo Gaming House";
+    $("#hint").className = "ok";
+  }
+})();
+</script>
+</body>
+</html>
