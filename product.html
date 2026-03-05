@@ -1,0 +1,587 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Dalaran — Producto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #f5f4f0;
+      --bg2:     #ffffff;
+      --bg3:     #edecea;
+      --border:  #e2e0db;
+      --text:    #1a1814;
+      --muted:   #6b6760;
+      --muted2:  #9b9890;
+      --accent:  #8B1A1A;
+      --accent2: #a52020;
+      --green:   #237804;
+      --shadow:  0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.06);
+      --shadow2: 0 2px 8px rgba(0,0,0,.12), 0 12px 32px rgba(0,0,0,.1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── TOP BANNER ── */
+    .top-banner {
+      background: var(--text);
+      color: #fff;
+      text-align: center;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .top-banner strong { color: #ffd666; }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--bg2);
+      border-bottom: 2px solid var(--text);
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .header-main {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      height: 64px;
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .logo span { color: var(--accent); }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .breadcrumb a { color: var(--muted); text-decoration: none; font-weight: 500; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb .sep { color: var(--muted2); }
+    .breadcrumb .current { color: var(--text); font-weight: 600; }
+
+    /* ── MAIN LAYOUT ── */
+    .product-page {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    /* ── LEFT: IMAGE ── */
+    .product-gallery {}
+
+    .product-main-img {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .product-main-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 32px;
+    }
+
+    .product-main-img .no-img {
+      font-size: 80px;
+      opacity: .15;
+    }
+
+    /* ── RIGHT: INFO ── */
+    .product-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* Scrolling tag strip like Gameology */
+    .product-tag-strip {
+      border: 2px solid var(--accent);
+      border-radius: 6px;
+      padding: 7px 14px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .product-tag-strip span {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .product-tag-strip span::after {
+      content: ' \2022 ';
+      margin: 0 6px;
+      opacity: .4;
+    }
+    .product-tag-strip span:last-child::after { content: ''; }
+
+    .product-title {
+      font-size: clamp(24px, 3vw, 36px);
+      font-weight: 900;
+      letter-spacing: -1px;
+      line-height: 1.05;
+      color: var(--text);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+
+    .product-description {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--muted);
+      margin-bottom: 24px;
+      max-height: 120px;
+      overflow: hidden;
+      position: relative;
+    }
+    .product-description.expanded { max-height: none; }
+    .product-description::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 40px;
+      background: linear-gradient(transparent, var(--bg));
+    }
+    .product-description.expanded::after { display: none; }
+
+    .read-more {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 24px;
+      text-decoration: underline;
+    }
+
+    /* Info grid like Gameology */
+    .product-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .meta-cell {
+      padding: 16px 20px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .meta-cell:nth-child(2n) { border-right: none; }
+    .meta-cell:nth-last-child(-n+2) { border-bottom: none; }
+    .meta-icon { font-size: 22px; }
+    .meta-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+    .meta-value { font-size: 14px; font-weight: 700; color: var(--text); }
+
+    /* Price */
+    .product-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .product-price {
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: -1px;
+    }
+    .price-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    /* Stock badge */
+    .stock-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 5px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+    .stock-badge.instock {
+      background: rgba(35,120,4,.1);
+      border: 1px solid rgba(35,120,4,.25);
+      color: var(--green);
+    }
+    .stock-badge .dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    /* CTA Button */
+    .btn-cta {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: background .15s, transform .1s;
+      margin-bottom: 12px;
+    }
+    .btn-cta:hover { background: var(--accent2); transform: translateY(-1px); }
+    .btn-cta:active { transform: translateY(0); }
+
+    /* Barcode */
+    .product-barcode {
+      font-size: 11px;
+      color: var(--muted2);
+      font-weight: 500;
+      letter-spacing: .3px;
+      margin-top: 8px;
+    }
+    .product-barcode strong { color: var(--muted); }
+
+    /* ── LOADING STATE ── */
+    .loading-state {
+      max-width: 1440px;
+      margin: 80px auto;
+      padding: 0 24px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── ERROR ── */
+    .error-state {
+      max-width: 1440px;
+      margin: 80px auto;
+      padding: 0 24px;
+      text-align: center;
+    }
+    .error-state h2 { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+    .error-state p { color: var(--muted); font-size: 14px; }
+
+    /* ── BACK BTN ── */
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border: 2px solid var(--border);
+      background: var(--bg2);
+      color: var(--text);
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color .15s;
+      margin-left: auto;
+    }
+    .btn-back:hover { border-color: var(--text); }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      .product-page { grid-template-columns: 1fr; gap: 24px; padding: 0 16px 40px; }
+      .header-main { padding: 0 16px; }
+      .breadcrumb { padding: 12px 16px; }
+      .product-title { font-size: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-banner">
+  Todos los juegos in-stock &mdash; Montevideo, Uruguay &mdash; <strong>Actualizado en tiempo real</strong>
+</div>
+
+<header>
+  <div class="header-main">
+    <a class="logo" href="index.html">Dala<span>ran</span></a>
+    <a href="index.html" class="btn-back">&#8592; Volver al cat&aacute;logo</a>
+  </div>
+</header>
+
+<div id="breadcrumb" class="breadcrumb">
+  <a href="index.html">Inicio</a>
+  <span class="sep">&#9658;</span>
+  <span class="current" id="breadcrumb-name">Cargando...</span>
+</div>
+
+<!-- LOADING -->
+<div id="loading" class="loading-state">
+  <div class="spinner"></div>
+  <p>Cargando producto...</p>
+</div>
+
+<!-- ERROR -->
+<div id="error" class="error-state" style="display:none">
+  <h2>Producto no encontrado</h2>
+  <p>No pudimos encontrar este producto. <a href="index.html">Volver al cat&aacute;logo</a></p>
+</div>
+
+<!-- PRODUCT -->
+<div id="product" class="product-page" style="display:none">
+
+  <!-- LEFT: IMAGE -->
+  <div class="product-gallery">
+    <div class="product-main-img" id="imgWrap">
+      <div class="no-img">&#127922;</div>
+    </div>
+  </div>
+
+  <!-- RIGHT: INFO -->
+  <div class="product-info">
+    <div class="product-tag-strip" id="tagStrip">
+      <span>In Stock</span>
+      <span>Juego de Mesa</span>
+      <span>Montevideo</span>
+    </div>
+
+    <h1 class="product-title" id="productTitle">—</h1>
+
+    <div class="product-description" id="productDesc" style="display:none"></div>
+    <button class="read-more" id="readMore" style="display:none">leer m&aacute;s</button>
+
+    <div class="product-meta-grid" id="metaGrid">
+      <div class="meta-cell">
+        <div class="meta-icon">&#127922;</div>
+        <div class="meta-label">Categor&iacute;a</div>
+        <div class="meta-value" id="metaCat">Juego de Mesa</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-icon">&#9989;</div>
+        <div class="meta-label">Disponibilidad</div>
+        <div class="meta-value" style="color:var(--green)">In Stock</div>
+      </div>
+    </div>
+
+    <div class="product-price-row">
+      <div class="product-price" id="productPrice">—</div>
+      <div class="price-label">Precio</div>
+    </div>
+
+    <div class="stock-badge instock">
+      <div class="dot"></div>
+      Disponible
+    </div>
+
+    <a id="ctaBtn" href="#" target="_blank" class="btn-cta">Comprar ahora</a>
+
+    <div class="product-barcode" id="productSku" style="display:none">
+      <strong>SKU:</strong> <span id="skuVal"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+(async () => {
+  var PROXY_BASE = "https://dalaran-proxy.gonzalo-carignani.workers.dev";
+  var apiBase    = PROXY_BASE + "/api";
+
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get("id");
+
+  function show(el) { el.style.display = ""; }
+  function hide(el) { el.style.display = "none"; }
+
+  if (!id) {
+    hide(document.getElementById("loading"));
+    show(document.getElementById("error"));
+    return;
+  }
+
+  try {
+    var r = await fetch(apiBase + "/products/" + id, { cache: "no-store" });
+    if (!r.ok) throw new Error("HTTP " + r.status);
+    var p = await r.json();
+
+    // Price
+    function numericPrice(p) {
+      var pr = p.prices;
+      if (pr && pr.price != null) {
+        var minor = isFinite(+pr.currency_minor_unit) ? +pr.currency_minor_unit : 2;
+        var n = Number(pr.price);
+        if (isFinite(n)) return n / Math.pow(10, minor);
+      }
+      return NaN;
+    }
+    function formatPrice(p) {
+      var pr = p.prices;
+      var htmlSrc = (pr && pr.price_html) || p.price_html || "";
+      if (htmlSrc) {
+        var tmp = document.createElement("div");
+        tmp.innerHTML = htmlSrc;
+        var t = tmp.textContent && tmp.textContent.replace(/\s+/g, " ").trim();
+        if (t) return t;
+      }
+      var n = numericPrice(p);
+      if (isFinite(n)) {
+        try { return new Intl.NumberFormat("es-UY", { style: "currency", currency: "UYU" }).format(n); }
+        catch(e) { return "UYU " + n; }
+      }
+      return "";
+    }
+
+    // Title
+    var title = p.name || "Producto";
+    document.title = title + " \u2014 Dalaran";
+    document.getElementById("productTitle").textContent = title;
+    document.getElementById("breadcrumb-name").textContent = title;
+
+    // Tag strip - use categories if available
+    var cats = (p.categories || []).map(function(c) { return c.name; });
+    if (cats.length > 0) {
+      var strip = document.getElementById("tagStrip");
+      strip.innerHTML = "";
+      var allTags = ["In Stock"].concat(cats).concat(["Dalaran"]);
+      allTags.forEach(function(t) {
+        var s = document.createElement("span");
+        s.textContent = t;
+        strip.appendChild(s);
+      });
+    }
+
+    // Image
+    var imgWrap = document.getElementById("imgWrap");
+    var imgSrc = p.images && p.images[0] && (p.images[0].src || p.images[0].thumbnail);
+    if (imgSrc) {
+      imgWrap.innerHTML = "";
+      var img = document.createElement("img");
+      img.src = imgSrc;
+      img.alt = title;
+      img.onerror = function() {
+        imgWrap.innerHTML = '<div class="no-img">&#127922;</div>';
+      };
+      imgWrap.appendChild(img);
+    }
+
+    // Description
+    var desc = p.description || p.short_description || "";
+    if (desc) {
+      var descEl = document.getElementById("productDesc");
+      descEl.innerHTML = desc;
+      show(descEl);
+      // Show read more if content is long
+      if (descEl.scrollHeight > 130) {
+        var btn = document.getElementById("readMore");
+        show(btn);
+        btn.addEventListener("click", function() {
+          descEl.classList.toggle("expanded");
+          btn.textContent = descEl.classList.contains("expanded") ? "leer menos" : "leer más";
+        });
+      }
+    }
+
+    // Price
+    var priceText = formatPrice(p);
+    document.getElementById("productPrice").textContent = priceText || "Consultar";
+
+    // CTA
+    var cta = document.getElementById("ctaBtn");
+    cta.href = p.permalink || "#";
+
+    // SKU
+    var sku = p.sku || "";
+    if (sku) {
+      document.getElementById("skuVal").textContent = sku;
+      show(document.getElementById("productSku"));
+    }
+
+    // Meta: players, time, etc from attributes if available
+    var attrs = p.attributes || [];
+    var metaGrid = document.getElementById("metaGrid");
+    var extraCells = [];
+
+    attrs.forEach(function(attr) {
+      var name = (attr.name || "").toLowerCase();
+      var vals = (attr.options || []).join(", ");
+      if (!vals) return;
+      var icon = "&#9881;";
+      if (name.includes("player") || name.includes("jugador")) icon = "&#128101;";
+      else if (name.includes("time") || name.includes("tiempo") || name.includes("duraci")) icon = "&#9200;";
+      else if (name.includes("age") || name.includes("edad")) icon = "&#127876;";
+      else if (name.includes("lang") || name.includes("idioma")) icon = "&#127760;";
+      extraCells.push({ icon: icon, label: attr.name, value: vals });
+    });
+
+    extraCells.forEach(function(cell) {
+      var div = document.createElement("div");
+      div.className = "meta-cell";
+      div.innerHTML = '<div class="meta-icon">' + cell.icon + '</div>'
+        + '<div class="meta-label">' + cell.label + '</div>'
+        + '<div class="meta-value">' + cell.value + '</div>';
+      metaGrid.appendChild(div);
+    });
+
+    // Show product
+    hide(document.getElementById("loading"));
+    show(document.getElementById("product"));
+
+  } catch(e) {
+    hide(document.getElementById("loading"));
+    show(document.getElementById("error"));
+    console.error(e);
+  }
+})();
+</script>
+</body>
+</html>
