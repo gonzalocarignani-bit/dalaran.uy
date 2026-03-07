@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Dalaran — Producto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #f5f4f0;
+      --bg2:     #ffffff;
+      --bg3:     #edecea;
+      --border:  #e2e0db;
+      --text:    #1a1814;
+      --muted:   #6b6760;
+      --muted2:  #9b9890;
+      --accent:  #8B1A1A;
+      --accent2: #a52020;
+      --green:   #237804;
+      --shadow:  0 1px 3px rgba(0,0,0,.08), 0 4px 12px rgba(0,0,0,.06);
+      --shadow2: 0 2px 8px rgba(0,0,0,.12), 0 12px 32px rgba(0,0,0,.1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── TOP BANNER ── */
+    .top-banner {
+      background: var(--text);
+      color: #fff;
+      text-align: center;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .top-banner strong { color: #ffd666; }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--bg2);
+      border-bottom: 2px solid var(--text);
+      position: sticky;
+      top: 0;
+      z-index: 200;
+    }
+    .header-main {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      height: 64px;
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: 900;
+      letter-spacing: -1px;
+      color: var(--text);
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .logo span { color: var(--accent); }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .breadcrumb a { color: var(--muted); text-decoration: none; font-weight: 500; }
+    .breadcrumb a:hover { color: var(--text); }
+    .breadcrumb .sep { color: var(--muted2); }
+    .breadcrumb .current { color: var(--text); font-weight: 600; }
+
+    /* ── MAIN LAYOUT ── */
+    .product-page {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    /* ── LEFT: IMAGE ── */
+    .product-gallery {}
+
+    .product-main-img {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .product-main-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 32px;
+    }
+
+    .product-main-img .no-img {
+      font-size: 80px;
+      opacity: .15;
+    }
+
+    /* ── RIGHT: INFO ── */
+    .product-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* Scrolling tag strip like Gameology */
+    .product-tag-strip {
+      border: 2px solid var(--accent);
+      border-radius: 6px;
+      padding: 7px 14px;
+      margin-bottom: 20px;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .product-tag-strip span {
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--accent);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .product-tag-strip span::after {
+      content: ' \2022 ';
+      margin: 0 6px;
+      opacity: .4;
+    }
+    .product-tag-strip span:last-child::after { content: ''; }
+
+    .product-title {
+      font-size: clamp(24px, 3vw, 36px);
+      font-weight: 900;
+      letter-spacing: -1px;
+      line-height: 1.05;
+      color: var(--text);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+
+    .product-description {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--muted);
+      margin-bottom: 24px;
+    }
+
+    .read-more {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 24px;
+      text-decoration: underline;
+    }
+
+    /* Info grid like Gameology */
+    .product-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+    .meta-cell {
+      padding: 16px 20px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .meta-cell:nth-child(2n) { border-right: none; }
+    .meta-cell:nth-last-child(-n+2) { border-bottom: none; }
+    .meta-icon { font-size: 22px; }
+    .meta-label { font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; }
+    .meta-value { font-size: 14px; font-weight: 700; color: var(--text); }
+
+    /* Price */
+    .product-price-row {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .product-price {
+      font-size: 36px;
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: -1px;
+    }
+    .price-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--green);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+
+
+    /* CTA Button */
+    .btn-cta {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      transition: background .15s, transform .1s;
+      margin-bottom: 12px;
+    }
+    .btn-cta:hover { background: var(--accent2); transform: translateY(-1px); }
+    .btn-cta:active { transform: translateY(0); }
+
+    /* Barcode */
+    .product-barcode {
+      font-size: 11px;
+      color: var(--muted2);
+      font-weight: 500;
+      letter-spacing: .3px;
+      margin-top: 8px;
+    }
+    .product-barcode strong { color: var(--muted); }
+
+    /* ── LOADING STATE ── */
+    .loading-state {
+      max-width: 1440px;
+      margin: 80px auto;
+      padding: 0 24px;
+      text-align: center;
+      color: var(--muted);
+    }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .8s linear infinite;
+      margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── ERROR ── */
+    .error-state {
+      max-width: 1440px;
+      margin: 80px auto;
+      padding: 0 24px;
+      text-align: center;
+    }
+    .error-state h2 { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+    .error-state p { color: var(--muted); font-size: 14px; }
+
+    /* ── BACK BTN ── */
+    .btn-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border: 2px solid var(--border);
+      background: var(--bg2);
+      color: var(--text);
+      border-radius: 6px;
+      font-family: 'Inter', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color .15s;
+      margin-left: auto;
+    }
+    .btn-back:hover { border-color: var(--text); }
+
+    /* ── SKELETONS ── */
+    @keyframes shimmer {
+      0%   { background-position: -800px 0; }
+      100% { background-position:  800px 0; }
+    }
+    .skel {
+      border-radius: 6px;
+      background: linear-gradient(90deg, var(--bg3) 25%, #e8e6e1 50%, var(--bg3) 75%);
+      background-size: 1600px 100%;
+      animation: shimmer 1.4s infinite linear;
+    }
+    .skel-img  { width:100%; height:100%; border-radius:0; }
+    .skel-tag  { height:32px; width:100%; margin-bottom:20px; }
+    .skel-title { height:40px; width:75%; margin-bottom:16px; border-radius:4px; }
+    .skel-line { height:14px; margin-bottom:8px; border-radius:4px; }
+    .skel-meta { height:100px; width:100%; margin-bottom:20px; }
+    .skel-price { height:48px; width:50%; margin-bottom:16px; border-radius:4px; }
+    .skel-btn   { height:54px; width:100%; border-radius:6px; }
+
+    /* ── MOBILE ── */
+    @media (max-width: 768px) {
+      /* Header */
+      .top-banner { font-size: 11px; padding: 6px 12px; }
+      .header-main { padding: 0 16px; height: 52px; }
+      .logo { font-size: 20px; }
+      .btn-back { font-size: 12px; padding: 6px 12px; }
+
+      /* Breadcrumb */
+      .breadcrumb { padding: 10px 16px; font-size: 12px; }
+      .breadcrumb .current {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 180px;
+        display: inline-block;
+      }
+
+      /* Layout: stack image above info, image smaller */
+      .product-page {
+        grid-template-columns: 1fr;
+        gap: 0;
+        padding: 0 0 40px;
+      }
+
+      /* Image: full width but capped height */
+      .product-main-img {
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+        aspect-ratio: 4 / 3;
+        max-height: 280px;
+      }
+      .product-main-img img { padding: 20px; }
+
+      /* Info section: padded */
+      .product-info {
+        padding: 20px 16px 0;
+      }
+
+      /* Tag strip: wrap instead of clip */
+      .product-tag-strip {
+        white-space: normal;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 8px 10px;
+        margin-bottom: 14px;
+      }
+      .product-tag-strip span {
+        font-size: 10px;
+      }
+      .product-tag-strip span::after { display: none; }
+
+      /* Title */
+      .product-title {
+        font-size: 22px;
+        letter-spacing: -.5px;
+        margin-bottom: 12px;
+      }
+
+      /* Description */
+      .product-description {
+        font-size: 13px;
+        margin-bottom: 16px;
+      }
+
+      /* Meta grid: 2 cols but compact */
+      .product-meta-grid { margin-bottom: 18px; }
+      .meta-cell { padding: 12px 10px; }
+      .meta-icon { font-size: 18px; }
+      .meta-label { font-size: 10px; }
+      .meta-value { font-size: 13px; }
+
+      /* Price */
+      .product-price { font-size: 28px; }
+      .product-price-row { margin-bottom: 14px; }
+      .stock-badge { margin-bottom: 14px; }
+
+      /* CTA sticky at bottom on mobile */
+      .btn-cta {
+        position: fixed;
+        bottom: 0; left: 0; right: 0;
+        border-radius: 0;
+        margin-bottom: 0;
+        z-index: 100;
+        padding: 18px;
+        font-size: 14px;
+        box-shadow: 0 -4px 20px rgba(0,0,0,.15);
+      }
+
+      /* Add bottom padding so content isn't hidden behind sticky CTA */
+      .product-info { padding-bottom: 80px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="top-banner">
+  Dalaran &mdash; Juegos de Mesa en Montevideo &mdash; <strong>Envíos y retiro disponible</strong>
+</div>
+
+<header>
+  <div class="header-main">
+    <a class="logo" href="index.html">Dala<span>ran</span></a>
+    <a href="index.html" class="btn-back">&#8592; Volver al cat&aacute;logo</a>
+  </div>
+</header>
+
+<div id="breadcrumb" class="breadcrumb">
+  <a href="index.html">Inicio</a>
+  <span class="sep">&#9658;</span>
+  <span class="current" id="breadcrumb-name">Cargando...</span>
+</div>
+
+<!-- LOADING (spinner only while IDs resolve) -->
+<div id="loading" class="loading-state">
+  <div class="spinner"></div>
+  <p>Cargando producto...</p>
+</div>
+
+<!-- ERROR -->
+<div id="error" class="error-state" style="display:none">
+  <h2>Producto no encontrado</h2>
+  <p>No pudimos encontrar este producto. <a href="index.html">Volver al cat&aacute;logo</a></p>
+</div>
+
+<!-- PRODUCT (shown immediately with skeletons, filled section by section) -->
+<div id="product" class="product-page" style="display:none">
+
+  <!-- LEFT: IMAGE -->
+  <div class="product-gallery">
+    <div class="product-main-img" id="imgWrap">
+      <div class="skel skel-img"></div>
+    </div>
+  </div>
+
+  <!-- RIGHT: INFO -->
+  <div class="product-info">
+    <div id="tagStrip" class="product-tag-strip" style="display:none">
+      <span>Juego de Mesa</span><span>Dalaran</span>
+    </div>
+    <div class="skel skel-tag" id="skelTag"></div>
+
+    <h1 class="product-title" id="productTitle" style="display:none">—</h1>
+    <div class="skel skel-title" id="skelTitle"></div>
+
+    <div class="product-description" id="productDesc" style="display:none"></div>
+    <div id="skelDesc">
+      <div class="skel skel-line" style="width:100%"></div>
+      <div class="skel skel-line" style="width:88%"></div>
+      <div class="skel skel-line" style="width:72%;margin-bottom:24px"></div>
+    </div>
+
+    <div class="product-meta-grid" id="metaGrid" style="display:none">
+      <div class="meta-cell">
+        <div class="meta-icon">&#128101;</div>
+        <div class="meta-label">Jugadores</div>
+        <div class="meta-value" id="metaPlayers">—</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-icon">&#127775;</div>
+        <div class="meta-label">Ideal</div>
+        <div class="meta-value" id="metaBest">—</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-icon">&#9200;</div>
+        <div class="meta-label">Duraci&oacute;n</div>
+        <div class="meta-value" id="metaTime">—</div>
+      </div>
+      <div class="meta-cell">
+        <div class="meta-icon">&#9989;</div>
+        <div class="meta-label">Disponibilidad</div>
+        <div class="meta-value" style="color:var(--green)">Disponible</div>
+      </div>
+    </div>
+    <div class="skel skel-meta" id="skelMeta"></div>
+
+    <div class="product-price-row" id="priceRow" style="display:none">
+      <div class="product-price" id="productPrice">—</div>
+      <div class="price-label">Precio</div>
+    </div>
+    <div class="skel skel-price" id="skelPrice"></div>
+
+
+
+    <a id="ctaBtn" href="#" target="_blank" class="btn-cta" style="display:none">Comprar ahora</a>
+    <div class="skel skel-btn" id="skelBtn"></div>
+
+    <div class="product-barcode" id="productSku" style="display:none">
+      <strong>SKU:</strong> <span id="skuVal"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+(async () => {
+  var PROXY_BASE = "https://dalaran-proxy.gonzalo-carignani.workers.dev";
+  var apiBase    = PROXY_BASE + "/api";
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get("id");
+
+  function show(el) { if(el) el.style.display = ""; }
+  function hide(el) { if(el) el.style.display = "none"; }
+  function el(id)   { return document.getElementById(id); }
+
+  if (!id) { hide(el("loading")); show(el("error")); return; }
+
+  // ── Reveal product shell immediately with skeletons ──
+  hide(el("loading"));
+  show(el("product"));
+
+  // ── Price helpers ──
+  function numericPrice(p) {
+    var pr = p.prices;
+    if (pr && pr.price != null) {
+      var minor = isFinite(+pr.currency_minor_unit) ? +pr.currency_minor_unit : 2;
+      var n = Number(pr.price);
+      if (isFinite(n)) return n / Math.pow(10, minor);
+    }
+    return NaN;
+  }
+  function formatPrice(p) {
+    var pr = p.prices;
+    var htmlSrc = (pr && pr.price_html) || p.price_html || "";
+    if (htmlSrc) {
+      var tmp = document.createElement("div");
+      tmp.innerHTML = htmlSrc;
+      var t = tmp.textContent && tmp.textContent.replace(/\s+/g, " ").trim();
+      if (t) return t;
+    }
+    var n = numericPrice(p);
+    if (isFinite(n)) {
+      try { return new Intl.NumberFormat("es-UY",{style:"currency",currency:"UYU",maximumFractionDigits:0}).format(Math.round(n*1.25)); }
+      catch(e) { return "UYU "+Math.round(n*1.25); }
+    }
+    return "";
+  }
+
+  // ── BGG fetch function ──
+  async function fetchBGG(title) {
+    var name = encodeURIComponent(title.replace(/\(.*\)/g,"").trim());
+    // Try exact first, then loose
+    for (var exact of ["&exact=1", ""]) {
+      var sRes = await fetch("https://boardgamegeek.com/xmlapi2/search?query="+name+"&type=boardgame"+exact);
+      var sXml = new DOMParser().parseFromString(await sRes.text(), "text/xml");
+      var items = sXml.querySelectorAll("item");
+      if (items.length > 0) {
+        var bggId = items[0].getAttribute("id");
+        var dRes = await fetch("https://boardgamegeek.com/xmlapi2/thing?id="+bggId+"&stats=1");
+        var dXml = new DOMParser().parseFromString(await dRes.text(), "text/xml");
+        return dXml.querySelector("item");
+      }
+    }
+    return null;
+  }
+
+  try {
+    // ── Fire MGH + BGG in PARALLEL ──
+    var mghPromise = fetch(apiBase+"/products/"+id, {cache:"no-store"}).then(function(r){
+      if (!r.ok) throw new Error("HTTP "+r.status);
+      return r.json();
+    });
+
+    // We need the title before starting BGG — so we chain after title is known
+    var p = await mghPromise;
+    var title = p.name || "Producto";
+
+    // Start BGG immediately after title known, don't await yet
+    var bggPromise = fetchBGG(title).catch(function(){ return null; });
+
+    // ── Render MGH data section by section ──
+
+    // Title + breadcrumb
+    document.title = title + " \u2014 Dalaran";
+    el("productTitle").textContent = title;
+    el("breadcrumb-name").textContent = title;
+    hide(el("skelTitle")); show(el("productTitle"));
+
+    // Tag strip
+    var cats = (p.categories||[]).map(function(c){return c.name;});
+    var strip = el("tagStrip");
+    strip.innerHTML = "";
+    var allTags = (cats.length?cats:["Juego de Mesa"]).concat(["Dalaran"]);
+    allTags.forEach(function(t){ var s=document.createElement("span"); s.textContent=t; strip.appendChild(s); });
+    hide(el("skelTag")); show(strip);
+
+    // Image
+    var imgWrap = el("imgWrap");
+    var imgSrc = p.images && p.images[0] && (p.images[0].src || p.images[0].thumbnail);
+    imgWrap.innerHTML = "";
+    if (imgSrc) {
+      var img = document.createElement("img");
+      img.src = imgSrc; img.alt = title;
+      img.onerror = function(){ imgWrap.innerHTML='<div class="no-img">&#127922;</div>'; };
+      imgWrap.appendChild(img);
+    } else {
+      imgWrap.innerHTML = '<div class="no-img">&#127922;</div>';
+    }
+
+    // Description
+    var desc = p.description || p.short_description || "";
+    if (desc) {
+      el("productDesc").innerHTML = desc;
+      hide(el("skelDesc")); show(el("productDesc"));
+    } else {
+      hide(el("skelDesc"));
+    }
+
+    // Price (+25% markup)
+    var priceText = formatPrice(p);
+    el("productPrice").textContent = priceText || "Consultar";
+    hide(el("skelPrice")); show(el("priceRow"));
+
+    // CTA + stock badge
+    el("ctaBtn").href = p.permalink || "#";
+    hide(el("skelBtn")); show(el("ctaBtn"));
+
+    // SKU
+    if (p.sku) { el("skuVal").textContent=p.sku; show(el("productSku")); }
+
+    // WC player attributes (pre-fill meta before BGG)
+    var wcMinP=null, wcMaxP=null, wcTime=null;
+    (p.attributes||[]).forEach(function(attr){
+      var n=(attr.name||"").toLowerCase();
+      var opts=(attr.options||[]).join(" ");
+      if (n.includes("jugador")||n.includes("player")) {
+        var nums=opts.match(/\d+/g);
+        if (nums){ var ns=nums.map(Number); wcMinP=Math.min.apply(null,ns); wcMaxP=Math.max.apply(null,ns); }
+      }
+      if (n.includes("tiempo")||n.includes("duraci")||n.includes("time")||n.includes("min")) wcTime=opts.trim();
+    });
+    if (wcMinP!==null) el("metaPlayers").textContent = wcMinP===wcMaxP ? wcMinP+" jugadores" : wcMinP+"\u2013"+wcMaxP+" jugadores";
+    if (wcTime) el("metaTime").textContent = wcTime;
+    // Show meta grid now (BGG will update values in place)
+    hide(el("skelMeta")); show(el("metaGrid"));
+
+    // ── Now await BGG (may already be done) ──
+    var game = await bggPromise;
+    if (game) {
+      var minP  = game.querySelector("minplayers");
+      var maxP  = game.querySelector("maxplayers");
+      var minTime = game.querySelector("minplaytime");
+      var maxTime = game.querySelector("maxplaytime");
+
+      var minVal = minP ? parseInt(minP.getAttribute("value")) : null;
+      var maxVal = maxP ? parseInt(maxP.getAttribute("value")) : null;
+      if (minVal && !isNaN(minVal)) {
+        el("metaPlayers").textContent = minVal===maxVal ? minVal+" jugadores" : minVal+"\u2013"+maxVal+" jugadores";
+      }
+
+      var polls = game.querySelectorAll("poll[name='suggested_numplayers'] results");
+      var bestCount=null, bestScore=-1;
+      polls.forEach(function(r){
+        var np=r.getAttribute("numplayers");
+        if (!np||np.includes("+")) return;
+        var best=r.querySelector("result[value='Best']");
+        if (best){ var v=parseInt(best.getAttribute("numvotes")||"0"); if(v>bestScore){bestScore=v;bestCount=np;} }
+      });
+      if (bestCount && bestScore>0) el("metaBest").textContent = bestCount+" jugadores";
+
+      var minT=minTime?parseInt(minTime.getAttribute("value")):null;
+      var maxT=maxTime?parseInt(maxTime.getAttribute("value")):null;
+      if (minT) el("metaTime").textContent = (minT===maxT||!maxT) ? minT+" min" : minT+"\u2013"+maxT+" min";
+
+      // BGG categories/mechanics → tag strip
+      var links = game.querySelectorAll("link[type='boardgamecategory'],link[type='boardgamemechanic']");
+      var existing = Array.from(strip.querySelectorAll("span")).map(function(s){return s.textContent;});
+      var added=0;
+      links.forEach(function(link){
+        if (added>=4) return;
+        var name=link.getAttribute("value");
+        if (name && existing.indexOf(name)===-1){ var s=document.createElement("span"); s.textContent=name; strip.appendChild(s); added++; }
+      });
+    }
+
+  } catch(e) {
+    hide(el("product"));
+    show(el("error"));
+    console.error(e);
+  }
+})();
+</script>
+</body>
+</html>
