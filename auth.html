@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Ingresar — Dalaran</title>
+  <title>Mi cuenta — Dalaran</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -14,57 +14,58 @@
       --accent:#2c4a7c; --accent2:#3a62a3; --green:#237804;
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    a{text-decoration:none;color:inherit;}
     body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
-
-    /* banner + header */
     .top-banner{background:var(--text);color:#fff;text-align:center;padding:8px 16px;font-size:12px;font-weight:500;}
     .top-banner strong{color:#ffd666;}
     header{background:var(--bg2);border-bottom:2px solid var(--text);}
     .header-inner{max-width:1440px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:64px;gap:16px;}
-    .logo{font-size:24px;font-weight:900;letter-spacing:-1px;color:var(--text);text-decoration:none;}
+    .logo{font-size:24px;font-weight:900;letter-spacing:-1px;color:var(--text);}
     .logo span{color:var(--accent);}
-    .header-back{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:2px solid var(--border);border-radius:6px;font-size:13px;font-weight:600;color:var(--text);text-decoration:none;transition:border-color .15s;}
+    .header-back{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:2px solid var(--border);border-radius:6px;font-size:13px;font-weight:600;color:var(--text);transition:border-color .15s;}
     .header-back:hover{border-color:var(--text);}
-
-    /* layout */
     .page{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 16px;}
-    .card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;width:100%;max-width:420px;padding:36px 32px;}
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;width:100%;max-width:440px;padding:36px 32px;}
     @media(max-width:480px){.card{padding:28px 20px;}}
-
     .card-title{font-size:22px;font-weight:900;margin-bottom:4px;}
     .card-sub{font-size:13px;color:var(--muted);margin-bottom:28px;}
-
-    /* tabs */
     .tabs{display:flex;border:2px solid var(--border);border-radius:8px;margin-bottom:28px;overflow:hidden;}
     .tab{flex:1;padding:10px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;background:none;border:none;cursor:pointer;color:var(--muted);transition:all .15s;}
     .tab.active{background:var(--text);color:#fff;}
-
-    /* form */
     .form-group{margin-bottom:16px;}
     .form-label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:6px;}
     .form-input{width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:var(--text);background:var(--bg);outline:none;transition:border-color .15s;}
     .form-input:focus{border-color:var(--text);background:var(--bg2);}
-    .form-input.error{border-color:var(--accent);}
-    .form-err{font-size:11px;color:#cc0000;font-weight:600;margin-top:4px;display:none;}
+    .form-input.error{border-color:#cc1a1a;}
+    .form-err{font-size:11px;color:#cc1a1a;font-weight:600;margin-top:4px;display:none;}
     .form-err.show{display:block;}
-
+    .check-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;}
+    .check-row input[type=checkbox]{width:17px;height:17px;flex-shrink:0;margin-top:2px;accent-color:var(--accent);cursor:pointer;}
+    .check-row label{font-size:12px;color:var(--muted);line-height:1.5;cursor:pointer;}
+    .check-row label a{color:var(--accent);font-weight:600;}
+    .check-row label a:hover{text-decoration:underline;}
+    .check-err{font-size:11px;color:#cc1a1a;font-weight:600;margin-top:-10px;margin-bottom:12px;display:none;}
+    .check-err.show{display:block;}
     .btn-submit{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:background .15s;margin-top:4px;}
     .btn-submit:hover{background:var(--accent2);}
     .btn-submit:disabled{background:var(--muted2);cursor:not-allowed;}
-
+    .forgot-link{display:block;text-align:right;font-size:12px;font-weight:600;color:var(--accent);margin-top:6px;cursor:pointer;}
+    .forgot-link:hover{text-decoration:underline;}
     .divider{text-align:center;font-size:12px;color:var(--muted2);margin:18px 0;position:relative;}
     .divider::before,.divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border);}
     .divider::before{left:0;} .divider::after{right:0;}
-
-    .guest-btn{display:block;width:100%;padding:12px;border:2px solid var(--border);background:var(--bg2);color:var(--text);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;text-align:center;text-decoration:none;transition:border-color .15s;}
+    .guest-btn{display:block;width:100%;padding:12px;border:2px solid var(--border);background:var(--bg2);color:var(--text);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;text-align:center;transition:border-color .15s;}
     .guest-btn:hover{border-color:var(--text);}
-
-    .global-err{background:#fff0f0;border:1px solid #ffccc7;border-radius:8px;padding:12px 14px;font-size:13px;color:#cc0000;font-weight:600;margin-bottom:16px;display:none;}
+    .global-err{background:#fff0f0;border:1px solid #ffccc7;border-radius:8px;padding:12px 14px;font-size:13px;color:#cc1a1a;font-weight:600;margin-bottom:16px;display:none;}
     .global-err.show{display:block;}
+    .global-ok{background:#f6ffed;border:1px solid #b7eb8f;border-radius:8px;padding:12px 14px;font-size:13px;color:#237804;font-weight:600;margin-bottom:16px;display:none;}
+    .global-ok.show{display:block;}
+    .back-link{font-size:13px;color:var(--accent);font-weight:600;cursor:pointer;margin-bottom:20px;display:inline-flex;align-items:center;gap:4px;}
+    .back-link:hover{text-decoration:underline;}
   </style>
 </head>
 <body>
-<div class="top-banner">🎲 Envíos a domicilio en Montevideo &mdash; <strong>Juegos de mesa para todos los gustos</strong></div>
+<div class="top-banner">&#127922; Envíos a domicilio en Montevideo &mdash; <strong>Juegos de mesa para todos los gustos</strong></div>
 <header>
   <div class="header-inner">
     <a class="logo" href="index.html">Dala<span>ran</span></a>
@@ -74,51 +75,101 @@
 
 <div class="page">
   <div class="card">
-    <div class="card-title">Mi cuenta</div>
-    <div class="card-sub">Accedé para ver tus pedidos y favoritos</div>
 
-    <div class="tabs">
-      <button class="tab active" id="tabLogin">Ingresar</button>
-      <button class="tab" id="tabRegister">Crear cuenta</button>
+    <!-- AUTH PANEL -->
+    <div id="authPanel">
+      <div class="card-title">Mi cuenta</div>
+      <div class="card-sub">Accedé para ver tus pedidos y favoritos</div>
+      <div class="tabs">
+        <button class="tab active" id="tabLogin">Ingresar</button>
+        <button class="tab" id="tabRegister">Crear cuenta</button>
+      </div>
+      <div class="global-err" id="globalErr"></div>
+
+      <!-- LOGIN -->
+      <div id="loginForm">
+        <div class="form-group">
+          <label class="form-label" for="loginEmail">Email</label>
+          <input class="form-input" id="loginEmail" type="email" placeholder="tu@email.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="loginPass">Contraseña</label>
+          <input class="form-input" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
+          <span class="forgot-link" id="forgotLink">¿Olvidaste tu contraseña?</span>
+        </div>
+        <button class="btn-submit" id="btnLogin">Ingresar</button>
+        <div class="divider">o</div>
+        <a href="cart.html" class="guest-btn">Continuar como invitado</a>
+      </div>
+
+      <!-- REGISTER -->
+      <div id="registerForm" style="display:none">
+        <div class="form-group">
+          <label class="form-label" for="regName">Nombre</label>
+          <input class="form-input" id="regName" type="text" placeholder="Juan García" autocomplete="name">
+          <div class="form-err" id="errRegName">Ingresá tu nombre (mín. 2 caracteres)</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="regEmail">Email</label>
+          <input class="form-input" id="regEmail" type="email" placeholder="tu@email.com" autocomplete="email">
+          <div class="form-err" id="errRegEmail">Email inválido</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="regPass">Contraseña</label>
+          <input class="form-input" id="regPass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+          <div class="form-err" id="errRegPass">Mínimo 6 caracteres</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="regPass2">Repetir contraseña</label>
+          <input class="form-input" id="regPass2" type="password" placeholder="Repetí tu contraseña" autocomplete="new-password">
+          <div class="form-err" id="errRegPass2">Las contraseñas no coinciden</div>
+        </div>
+        <div class="check-row">
+          <input type="checkbox" id="chkTerms">
+          <label for="chkTerms">Acepto los <a href="terminos.html" target="_blank">términos y condiciones</a> y la <a href="privacidad.html" target="_blank">política de privacidad</a> *</label>
+        </div>
+        <div class="check-err" id="errTerms">Tenés que aceptar los términos para continuar</div>
+        <div class="check-row">
+          <input type="checkbox" id="chkNewsletter" checked>
+          <label for="chkNewsletter">Quiero recibir novedades y ofertas exclusivas por email</label>
+        </div>
+        <button class="btn-submit" id="btnRegister">Crear cuenta</button>
+        <div class="divider">o</div>
+        <a href="cart.html" class="guest-btn">Continuar como invitado</a>
+      </div>
     </div>
 
-    <div class="global-err" id="globalErr"></div>
-
-    <!-- LOGIN FORM -->
-    <div id="loginForm">
+    <!-- FORGOT PANEL -->
+    <div id="forgotPanel" style="display:none">
+      <span class="back-link" id="backToLogin">&#8592; Volver a ingresar</span>
+      <div class="card-title">Recuperar contraseña</div>
+      <div class="card-sub">Ingresá tu email y te enviaremos un enlace para crear una nueva contraseña.</div>
+      <br>
+      <div class="global-ok" id="forgotOk"></div>
+      <div class="global-err" id="forgotErr"></div>
       <div class="form-group">
-        <label class="form-label" for="loginEmail">Email</label>
-        <input class="form-input" id="loginEmail" type="email" placeholder="tu@email.com" autocomplete="email">
+        <label class="form-label" for="forgotEmail">Email</label>
+        <input class="form-input" id="forgotEmail" type="email" placeholder="tu@email.com">
       </div>
-      <div class="form-group">
-        <label class="form-label" for="loginPass">Contraseña</label>
-        <input class="form-input" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
-      </div>
-      <button class="btn-submit" id="btnLogin">Ingresar</button>
-      <div class="divider">o</div>
-      <a href="cart.html" class="guest-btn">Continuar como invitado</a>
+      <button class="btn-submit" id="btnForgot">Enviar enlace</button>
     </div>
 
-    <!-- REGISTER FORM -->
-    <div id="registerForm" style="display:none">
+    <!-- RESET PANEL (shown when ?reset=token in URL) -->
+    <div id="resetPanel" style="display:none">
+      <div class="card-title">Nueva contraseña</div>
+      <div class="card-sub">Elegí una nueva contraseña para tu cuenta.</div>
+      <br>
+      <div class="global-ok" id="resetOk"></div>
+      <div class="global-err" id="resetErr"></div>
       <div class="form-group">
-        <label class="form-label" for="regName">Nombre</label>
-        <input class="form-input" id="regName" type="text" placeholder="Juan García" autocomplete="name">
-        <div class="form-err" id="errRegName">Ingresá tu nombre</div>
+        <label class="form-label" for="resetPass">Nueva contraseña</label>
+        <input class="form-input" id="resetPass" type="password" placeholder="Mínimo 6 caracteres">
       </div>
       <div class="form-group">
-        <label class="form-label" for="regEmail">Email</label>
-        <input class="form-input" id="regEmail" type="email" placeholder="tu@email.com" autocomplete="email">
-        <div class="form-err" id="errRegEmail">Email inválido</div>
+        <label class="form-label" for="resetPass2">Repetir contraseña</label>
+        <input class="form-input" id="resetPass2" type="password" placeholder="Repetí la contraseña">
       </div>
-      <div class="form-group">
-        <label class="form-label" for="regPass">Contraseña</label>
-        <input class="form-input" id="regPass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
-        <div class="form-err" id="errRegPass">Mínimo 6 caracteres</div>
-      </div>
-      <button class="btn-submit" id="btnRegister">Crear cuenta</button>
-      <div class="divider">o</div>
-      <a href="cart.html" class="guest-btn">Continuar como invitado</a>
+      <button class="btn-submit" id="btnReset">Guardar contraseña</button>
     </div>
 
   </div>
@@ -126,22 +177,50 @@
 
 <script>
 (function() {
-  var API_URL = "https://dalaran-backend-production.up.railway.app";
+  var API = "https://dalaran-backend-production.up.railway.app";
+  var params = new URLSearchParams(location.search);
+  var resetToken = params.get("reset");
 
-  // If already logged in, redirect
-  if (localStorage.getItem("dalaran_token")) {
-    var redir = new URLSearchParams(location.search).get("redirect") || "account.html";
-    location.href = redir;
+  // ── Reset mode ────────────────────────────────────────────────
+  if (resetToken) {
+    document.getElementById("authPanel").style.display = "none";
+    document.getElementById("resetPanel").style.display = "";
+    document.getElementById("btnReset").addEventListener("click", function() {
+      var pass  = document.getElementById("resetPass").value;
+      var pass2 = document.getElementById("resetPass2").value;
+      var errEl = document.getElementById("resetErr");
+      var okEl  = document.getElementById("resetOk");
+      errEl.classList.remove("show"); okEl.classList.remove("show");
+      if (pass.length < 6) { errEl.textContent = "Mínimo 6 caracteres"; errEl.classList.add("show"); return; }
+      if (pass !== pass2)  { errEl.textContent = "Las contraseñas no coinciden"; errEl.classList.add("show"); return; }
+      var btn = document.getElementById("btnReset");
+      btn.disabled = true; btn.textContent = "Guardando...";
+      fetch(API + "/api/auth/reset-password", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({ token: resetToken, password: pass })
+      })
+      .then(function(r){ return r.json(); })
+      .then(function(data) {
+        if (data.error) { errEl.textContent = data.error; errEl.classList.add("show"); btn.disabled=false; btn.textContent="Guardar contraseña"; return; }
+        okEl.textContent = "Contraseña actualizada correctamente. Redirigiendo...";
+        okEl.classList.add("show"); btn.textContent = "Guardado ✓";
+        setTimeout(function(){ location.href = "auth.html"; }, 2200);
+      })
+      .catch(function() { errEl.textContent = "Error de conexión"; errEl.classList.add("show"); btn.disabled=false; btn.textContent="Guardar contraseña"; });
+    });
     return;
   }
 
-  function showErr(msg) {
-    var el = document.getElementById("globalErr");
-    el.textContent = msg; el.classList.add("show");
+  // If already logged in, redirect
+  if (localStorage.getItem("dalaran_token")) {
+    location.href = params.get("redirect") || "account.html";
+    return;
   }
+
+  function showErr(msg) { var e=document.getElementById("globalErr"); e.textContent=msg; e.classList.add("show"); }
   function hideErr() { document.getElementById("globalErr").classList.remove("show"); }
 
-  // Tabs
+  // ── Tabs ──────────────────────────────────────────────────────
   document.getElementById("tabLogin").addEventListener("click", function() {
     document.getElementById("tabLogin").classList.add("active");
     document.getElementById("tabRegister").classList.remove("active");
@@ -157,15 +236,41 @@
     hideErr();
   });
 
-  // Enter key
+  // ── Forgot password ───────────────────────────────────────────
+  document.getElementById("forgotLink").addEventListener("click", function() {
+    document.getElementById("authPanel").style.display = "none";
+    document.getElementById("forgotPanel").style.display = "";
+  });
+  document.getElementById("backToLogin").addEventListener("click", function() {
+    document.getElementById("forgotPanel").style.display = "none";
+    document.getElementById("authPanel").style.display = "";
+  });
+  document.getElementById("btnForgot").addEventListener("click", function() {
+    var email = document.getElementById("forgotEmail").value.trim();
+    var errEl = document.getElementById("forgotErr");
+    var okEl  = document.getElementById("forgotOk");
+    errEl.classList.remove("show"); okEl.classList.remove("show");
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errEl.textContent = "Ingresá un email válido"; errEl.classList.add("show"); return;
+    }
+    var btn = document.getElementById("btnForgot");
+    btn.disabled = true; btn.textContent = "Enviando...";
+    fetch(API + "/api/auth/forgot-password", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ email })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function() {
+      okEl.textContent = "Si el email está registrado, recibirás un enlace en minutos. Revisá también spam.";
+      okEl.classList.add("show"); btn.textContent = "Enviado ✓";
+    })
+    .catch(function() { errEl.textContent="Error de conexión"; errEl.classList.add("show"); btn.disabled=false; btn.textContent="Enviar enlace"; });
+  });
+
+  // ── Login ──────────────────────────────────────────────────────
   ["loginEmail","loginPass"].forEach(function(id) {
     document.getElementById(id).addEventListener("keydown", function(e){ if(e.key==="Enter") doLogin(); });
   });
-  ["regName","regEmail","regPass"].forEach(function(id) {
-    document.getElementById(id).addEventListener("keydown", function(e){ if(e.key==="Enter") doRegister(); });
-  });
-
-  // Login
   document.getElementById("btnLogin").addEventListener("click", doLogin);
   function doLogin() {
     hideErr();
@@ -173,48 +278,59 @@
     var pass  = document.getElementById("loginPass").value;
     if (!email || !pass) { showErr("Completá todos los campos"); return; }
     var btn = document.getElementById("btnLogin");
-    btn.disabled = true; btn.textContent = "Ingresando...";
-    fetch(API_URL + "/api/auth/login", {
+    btn.disabled=true; btn.textContent="Ingresando...";
+    fetch(API + "/api/auth/login", {
       method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ email, password: pass })
+      body: JSON.stringify({ email, password:pass })
     })
     .then(function(r){ return r.json(); })
     .then(function(data) {
       if (data.error) { showErr(data.error); btn.disabled=false; btn.textContent="Ingresar"; return; }
       localStorage.setItem("dalaran_token", data.token);
       localStorage.setItem("dalaran_user", JSON.stringify(data.user));
-      var redir = new URLSearchParams(location.search).get("redirect") || "account.html";
-      location.href = redir;
+      location.href = params.get("redirect") || "account.html";
     })
     .catch(function() { showErr("Error de conexión"); btn.disabled=false; btn.textContent="Ingresar"; });
   }
 
-  // Register
+  // ── Register ──────────────────────────────────────────────────
+  ["regName","regEmail","regPass","regPass2"].forEach(function(id) {
+    document.getElementById(id).addEventListener("keydown", function(e){ if(e.key==="Enter") doRegister(); });
+  });
   document.getElementById("btnRegister").addEventListener("click", doRegister);
   function doRegister() {
     hideErr();
     var name  = document.getElementById("regName").value.trim();
     var email = document.getElementById("regEmail").value.trim();
     var pass  = document.getElementById("regPass").value;
+    var pass2 = document.getElementById("regPass2").value;
+    var terms = document.getElementById("chkTerms").checked;
+    var newsletter = document.getElementById("chkNewsletter").checked;
     var ok = true;
-    function fe(id, errId, cond) { var i=document.getElementById(id), e=document.getElementById(errId); if(!cond){i.classList.add("error");e.classList.add("show");ok=false;}else{i.classList.remove("error");e.classList.remove("show");} }
-    fe("regName","errRegName", name.length>=2);
-    fe("regEmail","errRegEmail", /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
-    fe("regPass","errRegPass", pass.length>=6);
+    function fe(id, errId, cond) {
+      var i=document.getElementById(id), e=document.getElementById(errId);
+      if(!cond){i.classList.add("error");e.classList.add("show");ok=false;}
+      else{i.classList.remove("error");e.classList.remove("show");}
+    }
+    fe("regName",  "errRegName",  name.length >= 2);
+    fe("regEmail", "errRegEmail", /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+    fe("regPass",  "errRegPass",  pass.length >= 6);
+    fe("regPass2", "errRegPass2", pass === pass2 && pass.length >= 6);
+    var termsErr = document.getElementById("errTerms");
+    if (!terms) { termsErr.classList.add("show"); ok=false; } else { termsErr.classList.remove("show"); }
     if (!ok) return;
     var btn = document.getElementById("btnRegister");
     btn.disabled=true; btn.textContent="Creando cuenta...";
-    fetch(API_URL + "/api/auth/register", {
+    fetch(API + "/api/auth/register", {
       method:"POST", headers:{"Content-Type":"application/json"},
-      body: JSON.stringify({ email, password:pass, name })
+      body: JSON.stringify({ email, password:pass, name, newsletter, terms_accepted:true })
     })
     .then(function(r){ return r.json(); })
     .then(function(data) {
       if (data.error) { showErr(data.error); btn.disabled=false; btn.textContent="Crear cuenta"; return; }
       localStorage.setItem("dalaran_token", data.token);
       localStorage.setItem("dalaran_user", JSON.stringify(data.user));
-      var redir = new URLSearchParams(location.search).get("redirect") || "account.html";
-      location.href = redir;
+      location.href = params.get("redirect") || "account.html";
     })
     .catch(function() { showErr("Error de conexión"); btn.disabled=false; btn.textContent="Crear cuenta"; });
   }
