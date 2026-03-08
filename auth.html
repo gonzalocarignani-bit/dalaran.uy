@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Ingresar — Dalaran</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#f5f4f0; --bg2:#fff; --bg3:#edecea; --border:#e2e0db;
+      --text:#1a1814; --muted:#6b6760; --muted2:#9b9890;
+      --accent:#2c4a7c; --accent2:#3a62a3; --green:#237804;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;}
+
+    /* banner + header */
+    .top-banner{background:var(--text);color:#fff;text-align:center;padding:8px 16px;font-size:12px;font-weight:500;}
+    .top-banner strong{color:#ffd666;}
+    header{background:var(--bg2);border-bottom:2px solid var(--text);}
+    .header-inner{max-width:1440px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:64px;gap:16px;}
+    .logo{font-size:24px;font-weight:900;letter-spacing:-1px;color:var(--text);text-decoration:none;}
+    .logo span{color:var(--accent);}
+    .header-back{margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:2px solid var(--border);border-radius:6px;font-size:13px;font-weight:600;color:var(--text);text-decoration:none;transition:border-color .15s;}
+    .header-back:hover{border-color:var(--text);}
+
+    /* layout */
+    .page{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 16px;}
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;width:100%;max-width:420px;padding:36px 32px;}
+    @media(max-width:480px){.card{padding:28px 20px;}}
+
+    .card-title{font-size:22px;font-weight:900;margin-bottom:4px;}
+    .card-sub{font-size:13px;color:var(--muted);margin-bottom:28px;}
+
+    /* tabs */
+    .tabs{display:flex;border:2px solid var(--border);border-radius:8px;margin-bottom:28px;overflow:hidden;}
+    .tab{flex:1;padding:10px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;background:none;border:none;cursor:pointer;color:var(--muted);transition:all .15s;}
+    .tab.active{background:var(--text);color:#fff;}
+
+    /* form */
+    .form-group{margin-bottom:16px;}
+    .form-label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:6px;}
+    .form-input{width:100%;padding:11px 14px;border:2px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:var(--text);background:var(--bg);outline:none;transition:border-color .15s;}
+    .form-input:focus{border-color:var(--text);background:var(--bg2);}
+    .form-input.error{border-color:var(--accent);}
+    .form-err{font-size:11px;color:#cc0000;font-weight:600;margin-top:4px;display:none;}
+    .form-err.show{display:block;}
+
+    .btn-submit{width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:15px;font-weight:800;cursor:pointer;transition:background .15s;margin-top:4px;}
+    .btn-submit:hover{background:var(--accent2);}
+    .btn-submit:disabled{background:var(--muted2);cursor:not-allowed;}
+
+    .divider{text-align:center;font-size:12px;color:var(--muted2);margin:18px 0;position:relative;}
+    .divider::before,.divider::after{content:'';position:absolute;top:50%;width:42%;height:1px;background:var(--border);}
+    .divider::before{left:0;} .divider::after{right:0;}
+
+    .guest-btn{display:block;width:100%;padding:12px;border:2px solid var(--border);background:var(--bg2);color:var(--text);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;text-align:center;text-decoration:none;transition:border-color .15s;}
+    .guest-btn:hover{border-color:var(--text);}
+
+    .global-err{background:#fff0f0;border:1px solid #ffccc7;border-radius:8px;padding:12px 14px;font-size:13px;color:#cc0000;font-weight:600;margin-bottom:16px;display:none;}
+    .global-err.show{display:block;}
+  </style>
+</head>
+<body>
+<div class="top-banner">🎲 Envíos a domicilio en Montevideo &mdash; <strong>Juegos de mesa para todos los gustos</strong></div>
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">Dala<span>ran</span></a>
+    <a href="index.html" class="header-back">&#8592; Volver al catálogo</a>
+  </div>
+</header>
+
+<div class="page">
+  <div class="card">
+    <div class="card-title">Mi cuenta</div>
+    <div class="card-sub">Accedé para ver tus pedidos y favoritos</div>
+
+    <div class="tabs">
+      <button class="tab active" id="tabLogin">Ingresar</button>
+      <button class="tab" id="tabRegister">Crear cuenta</button>
+    </div>
+
+    <div class="global-err" id="globalErr"></div>
+
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <div class="form-group">
+        <label class="form-label" for="loginEmail">Email</label>
+        <input class="form-input" id="loginEmail" type="email" placeholder="tu@email.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="loginPass">Contraseña</label>
+        <input class="form-input" id="loginPass" type="password" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <button class="btn-submit" id="btnLogin">Ingresar</button>
+      <div class="divider">o</div>
+      <a href="cart.html" class="guest-btn">Continuar como invitado</a>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="registerForm" style="display:none">
+      <div class="form-group">
+        <label class="form-label" for="regName">Nombre</label>
+        <input class="form-input" id="regName" type="text" placeholder="Juan García" autocomplete="name">
+        <div class="form-err" id="errRegName">Ingresá tu nombre</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="regEmail">Email</label>
+        <input class="form-input" id="regEmail" type="email" placeholder="tu@email.com" autocomplete="email">
+        <div class="form-err" id="errRegEmail">Email inválido</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="regPass">Contraseña</label>
+        <input class="form-input" id="regPass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+        <div class="form-err" id="errRegPass">Mínimo 6 caracteres</div>
+      </div>
+      <button class="btn-submit" id="btnRegister">Crear cuenta</button>
+      <div class="divider">o</div>
+      <a href="cart.html" class="guest-btn">Continuar como invitado</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function() {
+  var API_URL = "https://dalaran-backend-production.up.railway.app";
+
+  // If already logged in, redirect
+  if (localStorage.getItem("dalaran_token")) {
+    var redir = new URLSearchParams(location.search).get("redirect") || "account.html";
+    location.href = redir;
+    return;
+  }
+
+  function showErr(msg) {
+    var el = document.getElementById("globalErr");
+    el.textContent = msg; el.classList.add("show");
+  }
+  function hideErr() { document.getElementById("globalErr").classList.remove("show"); }
+
+  // Tabs
+  document.getElementById("tabLogin").addEventListener("click", function() {
+    document.getElementById("tabLogin").classList.add("active");
+    document.getElementById("tabRegister").classList.remove("active");
+    document.getElementById("loginForm").style.display = "";
+    document.getElementById("registerForm").style.display = "none";
+    hideErr();
+  });
+  document.getElementById("tabRegister").addEventListener("click", function() {
+    document.getElementById("tabRegister").classList.add("active");
+    document.getElementById("tabLogin").classList.remove("active");
+    document.getElementById("registerForm").style.display = "";
+    document.getElementById("loginForm").style.display = "none";
+    hideErr();
+  });
+
+  // Enter key
+  ["loginEmail","loginPass"].forEach(function(id) {
+    document.getElementById(id).addEventListener("keydown", function(e){ if(e.key==="Enter") doLogin(); });
+  });
+  ["regName","regEmail","regPass"].forEach(function(id) {
+    document.getElementById(id).addEventListener("keydown", function(e){ if(e.key==="Enter") doRegister(); });
+  });
+
+  // Login
+  document.getElementById("btnLogin").addEventListener("click", doLogin);
+  function doLogin() {
+    hideErr();
+    var email = document.getElementById("loginEmail").value.trim();
+    var pass  = document.getElementById("loginPass").value;
+    if (!email || !pass) { showErr("Completá todos los campos"); return; }
+    var btn = document.getElementById("btnLogin");
+    btn.disabled = true; btn.textContent = "Ingresando...";
+    fetch(API_URL + "/api/auth/login", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ email, password: pass })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (data.error) { showErr(data.error); btn.disabled=false; btn.textContent="Ingresar"; return; }
+      localStorage.setItem("dalaran_token", data.token);
+      localStorage.setItem("dalaran_user", JSON.stringify(data.user));
+      var redir = new URLSearchParams(location.search).get("redirect") || "account.html";
+      location.href = redir;
+    })
+    .catch(function() { showErr("Error de conexión"); btn.disabled=false; btn.textContent="Ingresar"; });
+  }
+
+  // Register
+  document.getElementById("btnRegister").addEventListener("click", doRegister);
+  function doRegister() {
+    hideErr();
+    var name  = document.getElementById("regName").value.trim();
+    var email = document.getElementById("regEmail").value.trim();
+    var pass  = document.getElementById("regPass").value;
+    var ok = true;
+    function fe(id, errId, cond) { var i=document.getElementById(id), e=document.getElementById(errId); if(!cond){i.classList.add("error");e.classList.add("show");ok=false;}else{i.classList.remove("error");e.classList.remove("show");} }
+    fe("regName","errRegName", name.length>=2);
+    fe("regEmail","errRegEmail", /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+    fe("regPass","errRegPass", pass.length>=6);
+    if (!ok) return;
+    var btn = document.getElementById("btnRegister");
+    btn.disabled=true; btn.textContent="Creando cuenta...";
+    fetch(API_URL + "/api/auth/register", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ email, password:pass, name })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (data.error) { showErr(data.error); btn.disabled=false; btn.textContent="Crear cuenta"; return; }
+      localStorage.setItem("dalaran_token", data.token);
+      localStorage.setItem("dalaran_user", JSON.stringify(data.user));
+      var redir = new URLSearchParams(location.search).get("redirect") || "account.html";
+      location.href = redir;
+    })
+    .catch(function() { showErr("Error de conexión"); btn.disabled=false; btn.textContent="Crear cuenta"; });
+  }
+
+})();
+</script>
+</body>
+</html>
