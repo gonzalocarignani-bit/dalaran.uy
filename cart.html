@@ -833,7 +833,17 @@
     fetch(API_URL + "/api/suggestions")
       .then(function(r){ return r.json(); })
       .then(function(data) {
-        suggProducts = data.products || [];
+        var raw = data.products || [];
+        suggProducts = raw.map(function(p) {
+          var minorUnit = p.prices && p.prices.currency_minor_unit != null ? p.prices.currency_minor_unit : 0;
+          var pv = p.prices && p.prices.price ? Math.round(Number(p.prices.price) / Math.pow(10, minorUnit) * 1.25) : 0;
+          return {
+            id:         p.id,
+            name:       p.name,
+            image:      p.images && p.images[0] ? p.images[0].src : "",
+            priceValue: pv,
+          };
+        });
         renderSuggestions();
       })
       .catch(function() {
