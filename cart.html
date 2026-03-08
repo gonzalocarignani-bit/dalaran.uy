@@ -772,22 +772,15 @@
   function loadSuggestions() {
     if (suggLoaded) return;
     suggLoaded = true;
-    var WP = "https://www.mundojuegos.com.ar/wp-json/wc/store/v1/products?per_page=40&orderby=popularity&order=desc";
-    fetch(WP)
+    fetch(API_URL + "/api/suggestions")
       .then(function(r){ return r.json(); })
-      .then(function(products) {
-        // pick 20 random from top 40
-        var shuffled = products.sort(function(){ return Math.random()-.5; }).slice(0, 20);
-        suggProducts = shuffled.map(function(p) {
-          var raw = parseFloat((p.prices && p.prices.price) ? p.prices.price : "0") / 100;
-          var price = Math.round(raw * 1.25);
-          var img = p.images && p.images[0] ? p.images[0].src : "";
-          return { id: p.id, name: p.name, image: img, priceValue: price };
-        });
+      .then(function(data) {
+        suggProducts = data.products || [];
         renderSuggestions();
       })
       .catch(function() {
-        document.getElementById("suggTrack").innerHTML = "";
+        var t = document.getElementById("suggTrack");
+        if (t) t.innerHTML = '<p style="color:#9b9890;font-size:13px;padding:20px;">No se pudieron cargar sugerencias.</p>';
       });
   }
 
