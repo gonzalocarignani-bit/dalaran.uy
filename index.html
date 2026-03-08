@@ -58,7 +58,7 @@
       height: 64px;
     }
     .logo {
-      font-size: 24px;
+      font-size: 30px;
       font-weight: 900;
       letter-spacing: -1px;
       color: var(--text);
@@ -453,6 +453,21 @@
     .results-count strong { color: var(--text); }
     .sort-wrap { display: flex; align-items: center; gap: 8px; }
     .sort-label { font-size: 12px; font-weight: 600; color: var(--muted); }
+    .sort-btns { display: flex; flex-direction: column; gap: 4px; }
+    .sort-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .sort-btn:hover { background: var(--hover); border-color: var(--accent); }
+    .sort-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 700; }
 
     @media (max-width: 860px) {
       .body-layout { flex-direction: column; padding: 0 16px 40px; }
@@ -701,12 +716,12 @@
     /* ── MOBILE ── */
     @media (max-width: 768px) {
       .header-main { height: auto; padding: 12px 16px; flex-wrap: wrap; gap: 10px; }
-      .logo { font-size: 20px; }
+      .logo { font-size: 26px; }
       .search-wrap { order: 3; flex: 1 1 100%; max-width: 100%; }
       .hero-inner { padding: 28px 16px; }
       .toolbar-inner { padding: 0 16px; height: auto; padding: 8px 16px; }
       main { padding: 16px 16px 40px; }
-      .grid { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); }
+      .grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
@@ -714,7 +729,7 @@
 
 <!-- TOP BANNER -->
 <div class="top-banner">
-  🎲 Envíos a domicilio en Montevideo &mdash; <strong>Juegos de mesa para todos los gustos</strong>
+  🎲 Envíos al interior del País &mdash; <strong>La mayor colección de juegos de mesa del Uruguay</strong>
 </div>
 
 <!-- HEADER -->
@@ -746,21 +761,7 @@
   </div>
 </header>
 
-<!-- TOOLBAR -->
-<div class="toolbar">
-  <div class="toolbar-inner">
-    <span class="toolbar-label">Precio</span>
-    <div class="price-range">
-      <input id="minP" class="num" type="number" inputmode="numeric" placeholder="Mín $" />
-      <span class="sep">—</span>
-      <input id="maxP" class="num" type="number" inputmode="numeric" placeholder="Máx $" />
-      <button id="clearPrice" class="btn">&#10005;</button>
-    </div>
-    <div class="divider-v"></div>
-    <button id="sort" class="btn">&#8597; <span id="sortLabel">Relevancia</span></button>
-    <span id="hint" style="display:none" data-adminonly="1">Conectando...</span>
-  </div>
-</div>
+
 
 <!-- HERO -->
 <div class="hero" id="hero">
@@ -800,9 +801,22 @@
     <div class="sidebar-section">
       <div class="sidebar-heading">Precio (UYU)</div>
       <div class="price-row">
-        <input class="price-input" id="minP" type="number" placeholder="Mín $" min="0">
+        <input class="price-input" id="minP" type="number" placeholder="Mín $" min="0" inputmode="numeric">
         <span class="price-sep">—</span>
-        <input class="price-input" id="maxP" type="number" placeholder="Máx $" min="0">
+        <input class="price-input" id="maxP" type="number" placeholder="Máx $" min="0" inputmode="numeric">
+        <button id="clearPrice" class="btn" style="padding:4px 8px;font-size:11px;">✕</button>
+      </div>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-heading">Ordenar por</div>
+      <div class="sort-btns">
+        <button class="sort-btn active" id="sortRelevancia" data-sort="relevancia">Relevancia</button>
+        <button class="sort-btn" id="sortPrecioAsc" data-sort="precio_asc">Precio ↑</button>
+        <button class="sort-btn" id="sortPrecioDesc" data-sort="precio_desc">Precio ↓</button>
+        <button class="sort-btn" id="sortAlfabetico" data-sort="alfabetico">A → Z</button>
       </div>
     </div>
 
@@ -975,6 +989,7 @@
       tags:       tagData.tags,
       minPlayers: tagData.minPlayers,
       maxPlayers: tagData.maxPlayers,
+      onSale:     !!p.on_sale,
     };
   }
 
@@ -986,10 +1001,12 @@
 
   // ── CONTROLS ──
   $("#top").addEventListener("click", function() { window.scrollTo({ top: 0, behavior: "smooth" }); });
-  $("#clearPrice").addEventListener("click", function() {
-    $("#minP").value = ""; $("#maxP").value = "";
-    renderGrid();
-  });
+  if ($("#clearPrice")) {
+    $("#clearPrice").addEventListener("click", function() {
+      $("#minP").value = ""; $("#maxP").value = "";
+      renderGrid();
+    });
+  }
   ["input","change"].forEach(function(ev) {
     $("#q").addEventListener(ev, renderGrid);
     $("#minP").addEventListener(ev, renderGrid);
@@ -1007,13 +1024,14 @@
     });
   });
 
-  var sortModes  = ["relevancia","precio_asc","precio_desc"];
-  var sortLabels = { relevancia: "Relevancia", precio_asc: "Precio \u2191", precio_desc: "Precio \u2193" };
-  $("#sort").addEventListener("click", function() {
-    var i = sortModes.indexOf(sortMode);
-    sortMode = sortModes[(i + 1) % sortModes.length];
-    $("#sortLabel").textContent = sortLabels[sortMode];
-    renderGrid();
+  // Sort buttons in sidebar
+  document.querySelectorAll(".sort-btn").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      sortMode = btn.dataset.sort;
+      document.querySelectorAll(".sort-btn").forEach(function(b) { b.classList.remove("active"); });
+      btn.classList.add("active");
+      renderGrid();
+    });
   });
 
   $("#exportCsv").addEventListener("click", function() {
@@ -1044,20 +1062,11 @@
     }
     if (sortMode === "precio_asc")  list.sort(function(a,b) { return (isFinite(a.priceValue)?a.priceValue:Infinity)  - (isFinite(b.priceValue)?b.priceValue:Infinity); });
     if (sortMode === "precio_desc") list.sort(function(a,b) { return (isFinite(b.priceValue)?b.priceValue:-Infinity) - (isFinite(a.priceValue)?a.priceValue:-Infinity); });
+    if (sortMode === "alfabetico")  list.sort(function(a,b) { return a.name.localeCompare(b.name, "es"); });
     return list;
   }
 
-  // ── MARK DEALS ──
-  var dealsRendered = false;
-
-  function markDeals(items) {
-    if (dealsRendered || items.length < 10) return;
-    dealsRendered = true;
-    var pool = items.filter(function(p){ return isFinite(p.priceValue) && p.priceValue > 0; });
-    for (var i=pool.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=pool[i];pool[i]=pool[j];pool[j]=t; }
-    pool.slice(0,10).forEach(function(p){ p.onSale = true; });
-    renderGrid();
-  }
+  // Ofertas definidas en la DB (mgh-build-db.js), no se calculan en el frontend
 
   // ── BUILD CARD ──
   function buildCard(p, idx) {
@@ -1408,7 +1417,6 @@
     renderGrid();
     animateCount(allItems.length);
     fillMosaic(allItems);
-    markDeals(allItems);
     $("#hint").textContent = "\u2713 " + allItems.length + " productos (cach\u00e9)";
     $("#hint").className = "ok";
     $("#resultsCount").innerHTML = "<strong>" + allItems.length + "</strong> juegos encontrados";
@@ -1428,7 +1436,7 @@
 
       $("#hint").textContent = "Cargando\u2026 " + allItems.length + " productos";
       if (!mosaicFilled && allItems.length >= 20) fillMosaic(allItems);
-      if (!dealsRendered && allItems.length >= 10) markDeals(allItems);
+      if (!dealsRendered && allItems.length >= 10) 
 
       if (page === 1) {
         removeSkeletons();
@@ -1458,7 +1466,7 @@
   if (!stopped) {
     if (!mosaicFilled) fillMosaic(allItems);
     if (!carouselFilled) fillCarousel(allItems);
-    if (!dealsRendered) markDeals(allItems);
+    if (!dealsRendered) 
     saveCache(allItems);
     $("#hint").textContent = "\u2713 " + allItems.length + " productos cargados";
     $("#hint").className = "ok";
