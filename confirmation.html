@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Pedido Confirmado — Dalaran</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#f5f4f0; --bg2:#fff; --bg3:#edecea; --border:#e2e0db;
+      --text:#1a1814; --muted:#6b6760; --muted2:#9b9890;
+      --accent:#2c4a7c; --accent2:#3a62a3; --green:#237804;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+    /* ── HEADER ── */
+    .top-banner{background:var(--text);color:#fff;text-align:center;padding:8px 16px;font-size:12px;font-weight:500;}
+    .top-banner strong{color:#ffd666;}
+    header{background:var(--bg2);border-bottom:2px solid var(--text);}
+    .header-inner{max-width:960px;margin:0 auto;padding:0 24px;display:flex;align-items:center;height:64px;gap:16px;}
+    .logo{font-size:24px;font-weight:900;letter-spacing:-1px;color:var(--text);text-decoration:none;}
+    .logo span{color:var(--accent);}
+    .header-right{margin-left:auto;display:flex;gap:10px;}
+    .header-link{padding:8px 16px;border:2px solid var(--border);border-radius:6px;font-size:13px;font-weight:600;color:var(--text);text-decoration:none;transition:border-color .15s;}
+    .header-link:hover{border-color:var(--text);}
+
+    /* ── HERO ── */
+    .hero{background:var(--text);padding:48px 24px 40px;text-align:center;}
+    .hero-check{
+      width:72px;height:72px;border-radius:50%;
+      background:var(--green);
+      display:inline-flex;align-items:center;justify-content:center;
+      font-size:32px;color:#fff;margin-bottom:20px;
+    }
+    .hero-title{font-size:32px;font-weight:900;color:#fff;margin-bottom:8px;letter-spacing:-.5px;}
+    .hero-order{font-size:14px;color:#9b9890;}
+    .hero-order strong{color:#ffd666;font-size:16px;}
+    .hero-email{margin-top:8px;font-size:13px;color:#6b6760;}
+
+    /* ── BODY ── */
+    .body{max-width:700px;margin:0 auto;padding:36px 24px 80px;}
+
+    /* Steps */
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px;}
+    @media(max-width:560px){.steps{grid-template-columns:1fr;}}
+    .step{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:20px 16px;text-align:center;}
+    .step-num{width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;margin-bottom:10px;}
+    .step-icon{font-size:26px;display:block;margin-bottom:8px;}
+    .step-title{font-size:13px;font-weight:800;margin-bottom:4px;}
+    .step-desc{font-size:12px;color:var(--muted);line-height:1.5;}
+
+    /* Sections */
+    .section{background:var(--bg2);border:1px solid var(--border);border-radius:12px;margin-bottom:16px;overflow:hidden;}
+    .section-header{padding:16px 20px;border-bottom:1px solid var(--border);background:var(--bg3);display:flex;align-items:center;gap:8px;}
+    .section-title{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);}
+    .section-body{padding:0;}
+
+    /* Items table */
+    .item-row{display:flex;align-items:center;gap:14px;padding:14px 20px;border-bottom:1px solid var(--border);}
+    .item-row:last-child{border-bottom:none;}
+    .item-thumb{width:44px;height:44px;border-radius:6px;background:var(--bg3);flex-shrink:0;overflow:hidden;}
+    .item-thumb img{width:100%;height:100%;object-fit:cover;}
+    .item-thumb-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:18px;}
+    .item-name{flex:1;font-size:14px;font-weight:700;line-height:1.3;}
+    .item-qty{font-size:13px;color:var(--muted);white-space:nowrap;}
+    .item-price{font-size:14px;font-weight:800;white-space:nowrap;}
+
+    /* Totals */
+    .total-row{display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:1px solid var(--border);font-size:13px;}
+    .total-row:last-child{border-bottom:none;}
+    .total-row .label{color:var(--muted);}
+    .total-row .value{font-weight:600;}
+    .total-row.grand{background:var(--text);padding:16px 20px;}
+    .total-row.grand .label,.total-row.grand .value{color:#fff;font-size:16px;font-weight:900;}
+    .total-row.grand .value{color:#ffd666;}
+
+    /* Customer info */
+    .info-row{display:flex;gap:12px;padding:12px 20px;border-bottom:1px solid var(--border);font-size:13px;}
+    .info-row:last-child{border-bottom:none;}
+    .info-label{color:var(--muted);font-weight:600;width:90px;flex-shrink:0;}
+    .info-value{color:var(--text);font-weight:500;line-height:1.4;}
+
+    /* Payment box */
+    .payment-box{background:var(--bg2);border:2px solid var(--accent);border-radius:12px;padding:24px;margin-bottom:16px;}
+    .payment-title{font-size:15px;font-weight:800;margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+    .payment-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:16px;}
+    .payment-pending{background:var(--bg3);border-radius:8px;padding:14px 16px;font-size:13px;color:var(--muted);text-align:center;line-height:1.6;}
+    .payment-pending strong{color:var(--text);display:block;margin-bottom:2px;font-size:14px;}
+
+    /* Actions */
+    .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px;}
+    .btn-primary{flex:1;min-width:140px;padding:14px 20px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;text-align:center;text-decoration:none;cursor:pointer;transition:background .15s;}
+    .btn-primary:hover{background:var(--accent2);}
+    .btn-wa{flex:1;min-width:140px;padding:14px 20px;background:#25d366;color:#fff;border:none;border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;text-align:center;text-decoration:none;cursor:pointer;transition:background .15s;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .btn-wa:hover{background:#1fba59;}
+    .btn-sec{flex:1;min-width:140px;padding:14px 20px;background:var(--bg2);color:var(--text);border:2px solid var(--border);border-radius:8px;font-family:'Inter',sans-serif;font-size:14px;font-weight:700;text-align:center;text-decoration:none;cursor:pointer;transition:border-color .15s;}
+    .btn-sec:hover{border-color:var(--text);}
+
+    /* Loading / error */
+    .loading-state{text-align:center;padding:80px 24px;color:var(--muted);}
+    .spinner{display:inline-block;width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:16px;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .error-state{text-align:center;padding:80px 24px;}
+    .error-icon{font-size:48px;margin-bottom:16px;}
+    .error-title{font-size:20px;font-weight:800;margin-bottom:8px;}
+    .error-desc{font-size:14px;color:var(--muted);margin-bottom:24px;}
+  </style>
+</head>
+<body>
+
+<div class="top-banner">Dalaran &mdash; Juegos de Mesa en Montevideo &mdash; <strong>Envíos a domicilio</strong></div>
+<header>
+  <div class="header-inner">
+    <a class="logo" href="index.html">Dala<span>ran</span></a>
+    <div class="header-right">
+      <a href="index.html" class="header-link">&#127922; Seguir comprando</a>
+    </div>
+  </div>
+</header>
+
+<!-- LOADING -->
+<div class="loading-state" id="loadingState">
+  <div class="spinner"></div>
+  <div>Cargando tu confirmación...</div>
+</div>
+
+<!-- ERROR -->
+<div class="error-state" id="errorState" style="display:none">
+  <div class="error-icon">😕</div>
+  <div class="error-title">No encontramos este pedido</div>
+  <div class="error-desc">El link puede haber expirado o ser incorrecto.</div>
+  <a href="index.html" class="btn-primary" style="display:inline-block;min-width:0;padding:12px 28px;">Ir al catálogo</a>
+</div>
+
+<!-- CONFIRMATION -->
+<div id="confirmState" style="display:none">
+  <div class="hero">
+    <div class="hero-check">✓</div>
+    <h1 class="hero-title">¡Pedido confirmado!</h1>
+    <div class="hero-order">Pedido <strong id="heroOrderNum">#—</strong></div>
+    <div class="hero-email" id="heroEmail"></div>
+  </div>
+
+  <div class="body">
+
+    <!-- Steps -->
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">1</span>
+        <span class="step-icon">💳</span>
+        <div class="step-title">Coordinamos el pago</div>
+        <div class="step-desc">Te contactamos para enviarte el link de Mercado Pago</div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <span class="step-icon">📦</span>
+        <div class="step-title">Preparamos tu pedido</div>
+        <div class="step-desc">Armamos el paquete una vez confirmado el pago</div>
+      </div>
+      <div class="step">
+        <span class="step-num">3</span>
+        <span class="step-icon">🚚</span>
+        <div class="step-title">Lo recibís en casa</div>
+        <div class="step-desc">Entrega en 24-48hs dentro de Montevideo</div>
+      </div>
+    </div>
+
+    <!-- Payment -->
+    <div class="payment-box">
+      <div class="payment-title">💳 Pago del pedido</div>
+      <div class="payment-desc">
+        Te vamos a enviar el link de pago por email y WhatsApp a la brevedad.
+        También podés escribirnos vos directamente.
+      </div>
+      <div class="payment-pending">
+        <strong>⏳ En espera de pago</strong>
+        Revisá tu email — te mandamos un resumen completo del pedido.
+      </div>
+    </div>
+
+    <!-- Order items -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">🛒 Productos</span>
+      </div>
+      <div class="section-body" id="itemsList"></div>
+      <div id="totalsBlock"></div>
+    </div>
+
+    <!-- Customer info -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">📍 Datos de entrega</span>
+      </div>
+      <div class="section-body" id="customerInfo"></div>
+    </div>
+
+    <!-- Actions -->
+    <div class="actions">
+      <a href="index.html" class="btn-primary">&#127922; Ver más juegos</a>
+      <a href="#" class="btn-wa" id="btnWA">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.1.543 4.072 1.497 5.783L0 24l6.385-1.677A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.001-1.366l-.358-.214-3.724.977.994-3.63-.234-.373A9.817 9.817 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
+        Escribir por WhatsApp
+      </a>
+      <a href="account.html" class="btn-sec" id="btnAccount" style="display:none">Ver mis pedidos</a>
+    </div>
+
+  </div>
+</div>
+
+<script>
+(function() {
+  var WHATSAPP = "59899000000"; // TODO: reemplazar con número real
+
+  function fmt(n) {
+    try { return new Intl.NumberFormat("es-UY",{style:"currency",currency:"UYU",maximumFractionDigits:0}).format(n); }
+    catch(e){ return "UYU "+n; }
+  }
+
+  // ── Read order from URL / localStorage ─────────────────────
+  var order = null;
+  try {
+    var raw = localStorage.getItem("dalaran_last_order");
+    if (raw) order = JSON.parse(raw);
+  } catch(e){}
+
+  // Also check URL param as fallback
+  var orderId = new URLSearchParams(location.search).get("id");
+
+  if (!order && !orderId) {
+    showError();
+    return;
+  }
+
+  if (order && (!orderId || String(order.id) === orderId)) {
+    render(order);
+  } else {
+    // Nothing in localStorage — show minimal state with just order ID
+    showError();
+  }
+
+  function showError() {
+    document.getElementById("loadingState").style.display = "none";
+    document.getElementById("errorState").style.display = "";
+  }
+
+  function render(o) {
+    document.getElementById("loadingState").style.display = "none";
+    document.getElementById("confirmState").style.display = "";
+
+    // Hero
+    document.getElementById("heroOrderNum").textContent = "#" + o.id;
+    document.getElementById("heroEmail").textContent = "Te enviamos un resumen a " + (o.email || "tu email");
+
+    // Show account link if logged in
+    if (localStorage.getItem("dalaran_token")) {
+      document.getElementById("btnAccount").style.display = "";
+    }
+
+    // Items
+    var items = Array.isArray(o.items) ? o.items : [];
+    document.getElementById("itemsList").innerHTML = items.map(function(item) {
+      var thumb = item.image
+        ? '<img src="'+item.image+'" alt="'+item.name+'" onerror="this.parentNode.innerHTML=\'🎲\'">'
+        : '<div class="item-thumb-placeholder">🎲</div>';
+      return '<div class="item-row">'
+        +'<div class="item-thumb">'+thumb+'</div>'
+        +'<div class="item-name">'+item.name+'</div>'
+        +'<div class="item-qty">×'+item.qty+'</div>'
+        +'<div class="item-price">'+fmt((item.priceValue||0)*(item.qty||1))+'</div>'
+        +'</div>';
+    }).join("");
+
+    // Totals
+    document.getElementById("totalsBlock").innerHTML =
+      '<div class="total-row"><span class="label">Subtotal</span><span class="value">'+fmt(o.subtotal)+'</span></div>'
+      +'<div class="total-row"><span class="label">Envío</span><span class="value">'+fmt(o.shipping)+'</span></div>'
+      +'<div class="total-row grand"><span class="label">Total</span><span class="value">'+fmt(o.total)+'</span></div>';
+
+    // Customer info
+    var infoRows = [["Nombre", o.name], ["Email", o.email], ["Dirección", o.address]];
+    document.getElementById("customerInfo").innerHTML = infoRows.map(function(r) {
+      return '<div class="info-row"><span class="info-label">'+r[0]+'</span><span class="info-value">'+r[1]+'</span></div>';
+    }).join("");
+
+    // WhatsApp
+    var msg = "Hola Dalaran! Acabo de hacer el pedido #"+o.id+" por "+fmt(o.total)+". Quedo esperando el link de pago!";
+    document.getElementById("btnWA").href = "https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(msg);
+
+    // Clear stored order after rendering
+    setTimeout(function(){ localStorage.removeItem("dalaran_last_order"); }, 5000);
+  }
+
+})();
+</script>
+</body>
+</html>
