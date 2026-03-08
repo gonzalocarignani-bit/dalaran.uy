@@ -1425,31 +1425,21 @@
     addSkeletons(24);
   }
 
-  for (var page = 1; !stopped; page++) {
+  if (!stopped) {
     try {
-      var url = apiBase + "/products?per_page=100&page=" + page + "&stock_status=instock";
+      $("#hint").textContent = "Cargando productos...";
+      var url = apiBase + "/products/all";
       var data = await fetchJson(url, controller.signal);
-      if (!Array.isArray(data) || data.length === 0) break;
+      if (!Array.isArray(data) || data.length === 0) throw new Error("Sin productos");
 
-      var items = data.map(normalizeItem);
-      allItems = allItems.concat(items);
+      allItems = data.map(normalizeItem);
 
-      $("#hint").textContent = "Cargando\u2026 " + allItems.length + " productos";
-      if (!mosaicFilled && allItems.length >= 20) fillMosaic(allItems);
-      if (!dealsRendered && allItems.length >= 10) 
-
-      if (page === 1) {
-        removeSkeletons();
-        renderGrid();
-      } else {
-        var frag2 = document.createDocumentFragment();
-        items.forEach(function(p, i) { frag2.appendChild(buildCard(p, allItems.length - items.length + i)); });
-        gridEl.appendChild(frag2);
-        footerEl.textContent = allItems.length + " productos mostrados";
-        $("#resultsCount").innerHTML = "<strong>" + allItems.length + "</strong> juegos encontrados";
-      }
-
-      if (data.length < 100) break;
+      removeSkeletons();
+      renderGrid();
+      if (!mosaicFilled) fillMosaic(allItems);
+      $("#hint").textContent = "\u2713 " + allItems.length + " productos cargados";
+      $("#hint").className = "ok";
+      $("#resultsCount").innerHTML = "<strong>" + allItems.length + "</strong> juegos encontrados";
     } catch(e) {
       if (!stopped) {
         removeSkeletons();
@@ -1459,19 +1449,12 @@
         $("#hint").textContent = "Error de conexi\u00f3n.";
         $("#hint").className = "err";
       }
-      break;
     }
   }
 
-  if (!stopped) {
-    if (!mosaicFilled) fillMosaic(allItems);
-    if (!carouselFilled) fillCarousel(allItems);
-    if (!dealsRendered) 
-    saveCache(allItems);
-    $("#hint").textContent = "\u2713 " + allItems.length + " productos cargados";
-    $("#hint").className = "ok";
-    $("#resultsCount").innerHTML = "<strong>" + allItems.length + "</strong> juegos encontrados";
-  }
+  // Llenar carousel si no se llenó
+  if (!carouselFilled && allItems.length > 0) fillCarousel(allItems);
+  saveCache(allItems);
 
   // ── AUTH UI ──
   (function() {
