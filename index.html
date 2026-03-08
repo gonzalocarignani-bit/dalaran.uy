@@ -834,6 +834,7 @@
       <div class="results-count" id="resultsCount"></div>
       <div class="sort-wrap"></div>
     </div>
+    <div id="hint" style="display:none;font-size:12px;color:#888;padding:4px 0;"></div>
     <div id="grid" class="grid"></div>
     <div id="footer" class="footer-bar"></div>
   </main>
@@ -1441,6 +1442,7 @@
       $("#hint").className = "ok";
       $("#resultsCount").innerHTML = "<strong>" + allItems.length + "</strong> juegos encontrados";
     } catch(e) {
+      console.error("[Dalaran] Error cargando productos:", e);
       if (!stopped) {
         removeSkeletons();
         if (allItems.length === 0) {
