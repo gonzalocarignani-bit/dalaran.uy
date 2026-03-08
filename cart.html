@@ -1,0 +1,543 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Carrito — Dalaran</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+  <style>
+    :root {
+      --bg:     #f5f4f0;
+      --bg2:    #ffffff;
+      --bg3:    #edecea;
+      --border: #e2e0db;
+      --text:   #1a1814;
+      --muted:  #6b6760;
+      --muted2: #9b9890;
+      --accent:  #2c4a7c;
+      --accent2: #3a62a3;
+      --green:  #237804;
+      --shadow: 0 1px 3px rgba(0,0,0,.07), 0 4px 12px rgba(0,0,0,.05);
+      --shadow2:0 2px 8px rgba(0,0,0,.1), 0 8px 24px rgba(0,0,0,.08);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── BANNER ── */
+    .top-banner { background: var(--text); color: #fff; text-align: center; padding: 8px 16px; font-size: 12px; font-weight: 500; }
+    .top-banner strong { color: #ffd666; }
+
+    /* ── HEADER ── */
+    header { background: var(--bg2); border-bottom: 2px solid var(--text); position: sticky; top: 0; z-index: 100; }
+    .header-main { max-width: 1100px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 16px; height: 64px; }
+    .logo { font-size: 24px; font-weight: 900; letter-spacing: -1px; color: var(--text); text-decoration: none; }
+    .logo span { color: var(--accent); }
+    .header-back { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border: 2px solid var(--border); border-radius: 6px; font-size: 13px; font-weight: 600; color: var(--text); text-decoration: none; transition: border-color .15s; }
+    .header-back:hover { border-color: var(--text); }
+
+    /* ── LAYOUT ── */
+    .page { max-width: 1100px; margin: 0 auto; padding: 32px 24px 80px; display: grid; grid-template-columns: 1fr 380px; gap: 32px; align-items: start; }
+    @media (max-width: 800px) { .page { grid-template-columns: 1fr; padding: 20px 16px 80px; } }
+
+    /* ── SECTION TITLES ── */
+    .section-title { font-size: 22px; font-weight: 900; letter-spacing: -.5px; margin-bottom: 20px; }
+
+    /* ── CART ITEMS ── */
+    .cart-list { display: flex; flex-direction: column; gap: 12px; }
+    .cart-empty { padding: 64px 20px; text-align: center; color: var(--muted); }
+    .cart-empty .icon { font-size: 48px; margin-bottom: 12px; }
+    .cart-empty p { font-size: 14px; margin-bottom: 20px; }
+    .cart-empty a { color: var(--accent); font-weight: 600; text-decoration: none; }
+
+    .cart-item {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      gap: 14px;
+      padding: 14px;
+      transition: box-shadow .15s;
+    }
+    .cart-item:hover { box-shadow: var(--shadow); }
+    .cart-item-img {
+      width: 72px; height: 72px;
+      border-radius: 6px;
+      background: var(--bg3);
+      overflow: hidden;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cart-item-img img { width: 100%; height: 100%; object-fit: contain; padding: 6px; }
+    .cart-item-img .no-img { font-size: 28px; opacity: .3; }
+    .cart-item-body { flex: 1; min-width: 0; }
+    .cart-item-name { font-size: 14px; font-weight: 700; line-height: 1.3; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cart-item-name a { color: inherit; text-decoration: none; }
+    .cart-item-name a:hover { color: var(--accent); }
+    .cart-item-price { font-size: 15px; font-weight: 800; color: var(--accent); }
+    .cart-item-controls { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+    .qty-btn { width: 28px; height: 28px; border: 2px solid var(--border); border-radius: 6px; background: var(--bg2); font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--text); transition: border-color .12s; line-height: 1; padding: 0; font-family: 'Inter', sans-serif; }
+    .qty-btn:hover { border-color: var(--text); }
+    .qty-display { font-size: 14px; font-weight: 700; min-width: 24px; text-align: center; }
+    .remove-btn { margin-left: auto; font-size: 11px; font-weight: 600; color: var(--muted2); cursor: pointer; background: none; border: none; padding: 4px 8px; border-radius: 4px; transition: color .12s; font-family: 'Inter', sans-serif; }
+    .remove-btn:hover { color: var(--accent); }
+
+    /* ── ORDER SUMMARY (right column) ── */
+    .summary-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 24px; position: sticky; top: 88px; z-index: 10; }
+    @media (max-width: 800px) { .summary-card { position: static !important; } }
+    .summary-title { font-size: 16px; font-weight: 800; margin-bottom: 18px; }
+    .summary-line { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+    .summary-line.total { font-size: 18px; font-weight: 900; color: var(--text); margin-top: 14px; padding-top: 14px; border-top: 2px solid var(--border); margin-bottom: 0; }
+    .summary-line strong { color: var(--text); font-weight: 700; }
+
+    /* ── CHECKOUT FORM ── */
+    .checkout-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 28px; margin-top: 24px; }
+    .checkout-title { font-size: 16px; font-weight: 800; margin-bottom: 20px; }
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 6px; }
+    .form-input {
+      width: 100%; padding: 11px 14px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 14px; font-weight: 500;
+      color: var(--text);
+      background: var(--bg);
+      transition: border-color .15s;
+      outline: none;
+    }
+    .form-input:focus { border-color: var(--text); background: var(--bg2); }
+    .form-input.error { border-color: var(--accent); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 500px) { .form-row { grid-template-columns: 1fr; } }
+    textarea.form-input { resize: vertical; min-height: 80px; }
+
+    .delivery-options { display: flex; gap: 10px; margin-bottom: 4px; }
+    .delivery-opt {
+      flex: 1; padding: 12px 10px; border: 2px solid var(--border);
+      border-radius: 8px; cursor: pointer; text-align: center;
+      font-size: 12px; font-weight: 700; transition: all .15s;
+      user-select: none;
+    }
+    .delivery-opt:hover { border-color: var(--text); }
+    .delivery-opt.active { border-color: var(--text); background: var(--text); color: #fff; }
+    .delivery-opt .opt-icon { font-size: 20px; display: block; margin-bottom: 4px; }
+
+    .btn-order {
+      width: 100%; padding: 16px; background: var(--accent); color: #fff;
+      border: none; border-radius: 8px; font-family: 'Inter', sans-serif;
+      font-size: 15px; font-weight: 800; letter-spacing: .3px;
+      cursor: pointer; margin-top: 20px;
+      transition: background .15s, transform .1s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-order:hover { background: var(--accent2); }
+    .btn-order:active { transform: scale(.99); }
+    .btn-order:disabled { background: var(--muted2); cursor: not-allowed; }
+
+    /* Whatsapp button */
+    .btn-whatsapp {
+      width: 100%; padding: 14px; background: #25D366; color: #fff;
+      border: none; border-radius: 8px; font-family: 'Inter', sans-serif;
+      font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 10px;
+      transition: background .15s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-whatsapp:hover { background: #1ebe5d; }
+
+    /* ── SUCCESS STATE ── */
+    .success-state { display: none; padding: 60px 24px; text-align: center; }
+    .success-icon { font-size: 64px; margin-bottom: 20px; }
+    .success-title { font-size: 28px; font-weight: 900; margin-bottom: 10px; }
+    .success-sub { font-size: 15px; color: var(--muted); margin-bottom: 32px; max-width: 400px; margin-left: auto; margin-right: auto; line-height: 1.6; }
+    .success-order { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 24px; max-width: 480px; margin: 0 auto 28px; text-align: left; }
+    .success-order-row { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+    .success-order-row strong { color: var(--text); }
+    .success-order-row.total { font-size: 16px; font-weight: 900; color: var(--text); padding-top: 12px; border-top: 2px solid var(--border); margin-top: 4px; }
+    .success-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .success-actions a { padding: 12px 24px; border-radius: 8px; font-size: 13px; font-weight: 700; text-decoration: none; transition: all .15s; }
+    .success-actions .btn-primary { background: var(--accent); color: #fff; }
+    .success-actions .btn-primary:hover { background: var(--accent2); }
+    .success-actions .btn-sec { background: var(--bg2); color: var(--text); border: 2px solid var(--border); }
+    .success-actions .btn-sec:hover { border-color: var(--text); }
+
+    /* ── TOAST ── */
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text); color: #fff; padding: 12px 24px; border-radius: 8px; font-size: 13px; font-weight: 600; opacity: 0; transition: all .3s; z-index: 999; white-space: nowrap; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── FIELD ERROR ── */
+    .shipping-info {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 16px;
+      background: var(--bg);
+      border: 2px solid var(--border);
+      border-radius: 8px;
+    }
+    .shipping-icon { font-size: 22px; flex-shrink: 0; }
+    .shipping-label { font-size: 14px; font-weight: 700; color: var(--text); }
+    .shipping-cost { font-size: 12px; font-weight: 600; color: var(--muted); margin-top: 2px; }
+
+    .field-err { font-size: 11px; color: var(--accent); font-weight: 600; margin-top: 4px; display: none; }
+    .field-err.show { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="top-banner">
+  Dalaran &mdash; Juegos de Mesa en Montevideo &mdash; <strong>Envíos y retiro disponible</strong>
+</div>
+
+<header>
+  <div class="header-main">
+    <a class="logo" href="index.html">Dala<span>ran</span></a>
+    <a href="index.html" class="header-back">&#8592; Seguir comprando</a>
+  </div>
+</header>
+
+<!-- SUCCESS STATE (hidden until order confirmed) -->
+<div class="success-state" id="successState">
+  <div class="success-icon">&#127881;</div>
+  <h1 class="success-title">¡Pedido confirmado!</h1>
+  <p class="success-sub">Recibimos tu pedido. Te vamos a contactar a la brevedad para coordinar el pago y la entrega.</p>
+  <div class="success-order" id="successOrder"></div>
+  <div class="success-actions">
+    <a href="index.html" class="btn-primary">Ver más juegos</a>
+    <a href="#" class="btn-sec" id="successWA">Enviar por WhatsApp</a>
+  </div>
+</div>
+
+<!-- CART PAGE -->
+<div class="page" id="cartPage">
+
+  <!-- LEFT: items -->
+  <div>
+    <h1 class="section-title">Tu carrito</h1>
+    <div id="cartList" class="cart-list"></div>
+  </div>
+
+  <!-- RIGHT: summary + form -->
+  <div>
+    <!-- Order summary -->
+    <div class="summary-card" id="summaryCard">
+      <div class="summary-title">Resumen del pedido</div>
+      <div id="summaryLines"></div>
+      <div class="summary-line total">
+        <span>Total</span>
+        <strong id="summaryTotal">—</strong>
+      </div>
+    </div>
+
+    <!-- Checkout form -->
+    <div class="checkout-card" id="checkoutCard">
+      <div class="checkout-title">Datos de contacto</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label" for="f-name">Nombre *</label>
+          <input class="form-input" id="f-name" type="text" placeholder="Juan García" autocomplete="given-name">
+          <div class="field-err" id="err-name">Ingresá tu nombre</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="f-last">Apellido *</label>
+          <input class="form-input" id="f-last" type="text" placeholder="García" autocomplete="family-name">
+          <div class="field-err" id="err-last">Ingresá tu apellido</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="f-email">Email *</label>
+        <input class="form-input" id="f-email" type="email" placeholder="juan@email.com" autocomplete="email">
+        <div class="field-err" id="err-email">Ingresá un email válido</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="f-phone">Teléfono / WhatsApp *</label>
+        <input class="form-input" id="f-phone" type="tel" placeholder="099 123 456" autocomplete="tel">
+        <div class="field-err" id="err-phone">Ingresá tu teléfono</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Entrega</label>
+        <div class="shipping-info">
+          <span class="shipping-icon">&#128230;</span>
+          <div>
+            <div class="shipping-label">Envío a domicilio</div>
+            <div class="shipping-cost">+ $175 costo de envío</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="f-addr">Dirección de entrega *</label>
+        <input class="form-input" id="f-addr" type="text" placeholder="Av. 18 de Julio 1234, Apto 5" autocomplete="street-address">
+        <div class="field-err" id="err-addr">Ingresá tu dirección</div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="f-notes">Notas (opcional)</label>
+        <textarea class="form-input" id="f-notes" placeholder="¿Algún comentario sobre tu pedido?"></textarea>
+      </div>
+
+      <button class="btn-order" id="btnOrder">
+        &#10003;&nbsp; Confirmar pedido
+      </button>
+      <button class="btn-whatsapp" id="btnWhatsapp">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.1.543 4.072 1.497 5.783L0 24l6.385-1.677A11.945 11.945 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.001-1.366l-.358-.214-3.724.977.994-3.63-.234-.373A9.817 9.817 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182c5.43 0 9.818 4.388 9.818 9.818 0 5.43-4.388 9.818-9.818 9.818z"/></svg>
+        Coordinar por WhatsApp
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="cart.js"></script>
+<script>
+(function() {
+
+  // ── CONFIG ──
+  var WHATSAPP_NUMBER = "59899000000"; // TODO: reemplazar con tu número real
+  // EmailJS — crear cuenta gratis en emailjs.com y completar estos 3 valores:
+  var EMAILJS_PUBLIC_KEY  = "TU_PUBLIC_KEY";   // Account > API Keys
+  var EMAILJS_SERVICE_ID  = "TU_SERVICE_ID";   // Email Services
+  var EMAILJS_TEMPLATE_ID = "TU_TEMPLATE_ID";  // Email Templates
+  try { emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY }); } catch(e) {}
+
+  function fmt(n) {
+    if (!isFinite(n)) return "—";
+    try { return new Intl.NumberFormat("es-UY",{style:"currency",currency:"UYU",maximumFractionDigits:0}).format(n); }
+    catch(e) { return "UYU "+n; }
+  }
+
+  var SHIPPING_COST = 175;
+
+  function showToast(msg) {
+    var t = document.getElementById("toast");
+    t.textContent = msg; t.classList.add("show");
+    setTimeout(function(){ t.classList.remove("show"); }, 2500);
+  }
+
+  // ── RENDER CART ──
+  function render() {
+    var items = DalaranCart.load();
+    var listEl = document.getElementById("cartList");
+    var summaryEl = document.getElementById("summaryLines");
+
+    if (items.length === 0) {
+      listEl.innerHTML = '<div class="cart-empty"><div class="icon">&#127922;</div><p>Tu carrito está vacío.</p><a href="index.html">Ver catálogo de juegos</a></div>';
+      document.getElementById("summaryCard").style.display = "none";
+      document.getElementById("checkoutCard").style.display = "none";
+      return;
+    }
+
+    document.getElementById("summaryCard").style.display = "";
+    document.getElementById("checkoutCard").style.display = "";
+
+    // Items list
+    listEl.innerHTML = "";
+    items.forEach(function(item) {
+      var div = document.createElement("div");
+      div.className = "cart-item";
+      div.innerHTML = '<div class="cart-item-img">'
+        + (item.image
+            ? '<img src="'+item.image+'" alt="'+item.name+'" onerror="this.parentNode.innerHTML=\'<div class=no-img>🎲</div>\'">'
+            : '<div class="no-img">🎲</div>')
+        + '</div>'
+        + '<div class="cart-item-body">'
+        + '<div class="cart-item-name"><a href="product.html?id='+item.id+'">'+item.name+'</a></div>'
+        + '<div class="cart-item-price">'+fmt(item.priceValue)+'</div>'
+        + '<div class="cart-item-controls">'
+        + '<button class="qty-btn" data-id="'+item.id+'" data-delta="-1">−</button>'
+        + '<span class="qty-display">'+item.qty+'</span>'
+        + '<button class="qty-btn" data-id="'+item.id+'" data-delta="1">+</button>'
+        + '<button class="remove-btn" data-id="'+item.id+'">Eliminar</button>'
+        + '</div></div>';
+      listEl.appendChild(div);
+    });
+
+    // Qty controls
+    listEl.querySelectorAll(".qty-btn").forEach(function(btn) {
+      btn.addEventListener("click", function(e) {
+        e.preventDefault();
+        var id = parseInt(btn.dataset.id);
+        var item = DalaranCart.load().find(function(i){return i.id===id;});
+        if (item) DalaranCart.setQty(id, (item.qty||1) + parseInt(btn.dataset.delta));
+        render();
+      });
+    });
+    listEl.querySelectorAll(".remove-btn").forEach(function(btn) {
+      btn.addEventListener("click", function(e) {
+        e.preventDefault();
+        DalaranCart.remove(parseInt(btn.dataset.id));
+        showToast("Producto eliminado");
+        render();
+      });
+    });
+
+    // Summary
+    summaryEl.innerHTML = "";
+    items.forEach(function(item) {
+      var line = document.createElement("div");
+      line.className = "summary-line";
+      line.innerHTML = '<span>'+item.name.substring(0,28)+(item.name.length>28?'…':'')
+        +' <strong>×'+item.qty+'</strong></span>'
+        + '<span>'+fmt(item.priceValue * item.qty)+'</span>';
+      summaryEl.appendChild(line);
+    });
+    // Shipping line
+    var shipLine = document.createElement("div");
+    shipLine.className = "summary-line";
+    shipLine.innerHTML = '<span>Envío a domicilio</span><span>'+fmt(SHIPPING_COST)+'</span>';
+    summaryEl.appendChild(shipLine);
+    document.getElementById("summaryTotal").textContent = fmt(DalaranCart.total() + SHIPPING_COST);
+  }
+
+  render();
+
+  // ── VALIDATION ──
+  function val(id, ok) {
+    var input = document.getElementById(id);
+    var err   = document.getElementById("err-"+id.replace("f-",""));
+    if (!ok) { input.classList.add("error"); if(err) err.classList.add("show"); }
+    else     { input.classList.remove("error"); if(err) err.classList.remove("show"); }
+    return ok;
+  }
+
+  function validateForm() {
+    var name  = document.getElementById("f-name").value.trim();
+    var last  = document.getElementById("f-last").value.trim();
+    var email = document.getElementById("f-email").value.trim();
+    var phone = document.getElementById("f-phone").value.trim();
+    var addr  = document.getElementById("f-addr").value.trim();
+
+    var ok = true;
+    ok = val("f-name",  name.length >= 2)  && ok;
+    ok = val("f-last",  last.length >= 2)  && ok;
+    ok = val("f-email", /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) && ok;
+    ok = val("f-phone", phone.length >= 7) && ok;
+    ok = val("f-addr",  addr.length >= 5)  && ok;
+    return ok;
+  }
+
+  function getFormData() {
+    return {
+      name:     document.getElementById("f-name").value.trim() + " " + document.getElementById("f-last").value.trim(),
+      email:    document.getElementById("f-email").value.trim(),
+      phone:    document.getElementById("f-phone").value.trim(),
+      delivery: "envio",
+      address:  document.getElementById("f-addr").value.trim(),
+      notes:    document.getElementById("f-notes").value.trim(),
+    };
+  }
+
+  // ── BUILD ORDER SUMMARY TEXT ──
+  function buildOrderText(formData, items) {
+    var lines = ["*Pedido Dalaran*\n"];
+    items.forEach(function(item) {
+      lines.push("• "+item.name+" ×"+item.qty+" — "+fmt(item.priceValue*item.qty));
+    });
+    lines.push("• Envío a domicilio — "+fmt(SHIPPING_COST));
+    lines.push("\n*Total: "+fmt(DalaranCart.total()+SHIPPING_COST)+"*");
+    lines.push("\n*Cliente:* "+formData.name);
+    lines.push("*Tel:* "+formData.phone);
+    lines.push("*Email:* "+formData.email);
+    lines.push("*Dirección:* "+formData.address);
+    if (formData.notes) lines.push("*Notas:* "+formData.notes);
+    return lines.join("\n");
+  }
+
+  // ── CONFIRM ORDER ──
+  document.getElementById("btnOrder").addEventListener("click", function() {
+    if (DalaranCart.count() === 0) { showToast("El carrito está vacío"); return; }
+    if (!validateForm()) { showToast("Completá los campos requeridos"); return; }
+
+    var formData = getFormData();
+    var items = DalaranCart.load();
+    var total = DalaranCart.total() + SHIPPING_COST;
+
+    // Build success screen
+    var orderEl = document.getElementById("successOrder");
+    var rows = items.map(function(item) {
+      return '<div class="success-order-row"><span>'+item.name+' ×'+item.qty+'</span><strong>'+fmt(item.priceValue*item.qty)+'</strong></div>';
+    }).join("");
+    rows += '<div class="success-order-row"><span>Envío a domicilio</span><strong>'+fmt(SHIPPING_COST)+'</strong></div>';
+    rows += '<div class="success-order-row total"><span>Total</span><strong>'+fmt(total)+'</strong></div>';
+    rows += '<div class="success-order-row" style="margin-top:12px"><span>Cliente</span><strong>'+formData.name+'</strong></div>';
+    rows += '<div class="success-order-row"><span>Teléfono</span><strong>'+formData.phone+'</strong></div>';
+    rows += '<div class="success-order-row"><span>Email</span><strong>'+formData.email+'</strong></div>';
+    rows += '<div class="success-order-row"><span>Dirección</span><strong>'+formData.address+'</strong></div>';
+    if (formData.notes) rows += '<div class="success-order-row"><span>Notas</span><strong>'+formData.notes+'</strong></div>';
+    orderEl.innerHTML = rows;
+
+    // WhatsApp button
+    var waText = encodeURIComponent(buildOrderText(formData, items));
+    document.getElementById("successWA").href = "https://wa.me/"+WHATSAPP_NUMBER+"?text="+waText;
+
+    // ── Send email via EmailJS ──
+    var btn = document.getElementById("btnOrder");
+    btn.disabled = true;
+    btn.textContent = "Enviando pedido…";
+
+    var itemLines = items.map(function(i){
+      return i.name + " ×" + i.qty + "  —  " + fmt(i.priceValue * i.qty);
+    }).join("\n");
+
+    var emailParams = {
+      to_name:   "Gonzalo",
+      from_name: formData.name,
+      reply_to:  formData.email,
+      phone:     formData.phone,
+      address:   formData.address,
+      notes:     formData.notes || "—",
+      items:     itemLines,
+      shipping:  fmt(SHIPPING_COST),
+      total:     fmt(total),
+    };
+
+    var emailJSConfigured = EMAILJS_PUBLIC_KEY !== "TU_PUBLIC_KEY";
+
+    function showSuccess() {
+      document.getElementById("cartPage").style.display = "none";
+      document.getElementById("successState").style.display = "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      DalaranCart.clear();
+    }
+
+    if (emailJSConfigured) {
+      emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, emailParams)
+        .then(function() {
+          showSuccess();
+        })
+        .catch(function(err) {
+          console.error("EmailJS error:", err);
+          btn.disabled = false;
+          btn.textContent = "✓ Confirmar pedido";
+          showToast("Error al enviar el pedido. Intentá de nuevo.");
+        });
+    } else {
+      // EmailJS not configured yet — still show success so UX works
+      console.warn("EmailJS no configurado. Completá EMAILJS_PUBLIC_KEY, SERVICE_ID y TEMPLATE_ID en cart.html.");
+      showSuccess();
+    }
+  });
+
+  // ── WHATSAPP DIRECT (skip form) ──
+  document.getElementById("btnWhatsapp").addEventListener("click", function() {
+    var items = DalaranCart.load();
+    if (items.length === 0) { showToast("El carrito está vacío"); return; }
+
+    var lines = ["*Hola Dalaran! Me interesa comprar:*\n"];
+    items.forEach(function(item) {
+      lines.push("• "+item.name+" ×"+item.qty+" — "+fmt(item.priceValue*item.qty));
+    });
+    lines.push("\n*Total: "+fmt(DalaranCart.total())+"*");
+    var waText = encodeURIComponent(lines.join("\n"));
+    window.open("https://wa.me/"+WHATSAPP_NUMBER+"?text="+waText, "_blank");
+  });
+
+})();
+</script>
+</body>
+</html>
