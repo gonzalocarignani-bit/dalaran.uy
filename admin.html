@@ -201,10 +201,12 @@
   <div class="login-card">
     <div class="login-logo">Dala<span>ran</span></div>
     <div class="login-sub">Panel de administración</div>
-    <label class="login-label" for="adminKey">Clave de acceso</label>
-    <input class="login-input" id="adminKey" type="password" placeholder="••••••••••••" autocomplete="current-password">
+    <label class="login-label" for="adminEmail">Email</label>
+    <input class="login-input" id="adminEmail" type="email" placeholder="gonzalo@dalaran.uy" autocomplete="email" style="margin-bottom:12px;">
+    <label class="login-label" for="adminPass">Contraseña</label>
+    <input class="login-input" id="adminPass" type="password" placeholder="••••••••••••" autocomplete="current-password">
     <button class="login-btn" id="loginBtn">Ingresar</button>
-    <div class="login-err" id="loginErr">Clave incorrecta</div>
+    <div class="login-err" id="loginErr">Credenciales incorrectas</div>
   </div>
 </div>
 
@@ -290,8 +292,8 @@
 (function() {
 
   var API_URL    = "https://dalaran-backend-production.up.railway.app";
-  var SESSION_KEY = "dalaran_admin_key";
-  var adminKey   = "";
+  var SESSION_KEY = "dalaran_admin_token";
+  var adminToken = "";
   var allOrders  = [];
   var activeFilter = "todos";
 
@@ -325,63 +327,59 @@
 
   // ── LOGIN ──
   document.getElementById("loginBtn").addEventListener("click", tryLogin);
-  document.getElementById("adminKey").addEventListener("keydown", function(e){ if(e.key==="Enter") tryLogin(); });
+  document.getElementById("adminEmail").addEventListener("keydown", function(e){ if(e.key==="Enter") tryLogin(); });
+  document.getElementById("adminPass").addEventListener("keydown",  function(e){ if(e.key==="Enter") tryLogin(); });
 
-  var saved = sessionStorage.getItem(SESSION_KEY);
-  if (saved) {
-    adminKey = saved;
+  var savedToken = sessionStorage.getItem(SESSION_KEY);
+  if (savedToken) {
+    adminToken = savedToken;
     fetch(API_URL + "/api/admin/orders", {
-      headers: { "x-admin-key": saved },
-      cache: "no-store"
+      headers: { "Authorization": "Bearer " + adminToken }, cache: "no-store"
     })
-      .then(function(r) {
-        if (r.status === 401) throw new Error("unauthorized");
-        return r.text();
-      })
-      .then(function(text) {
-        var data = text ? JSON.parse(text) : { orders: [] };
-        allOrders = data.orders || [];
-        showAdmin();
-        renderAll();
-      })
-      .catch(function() {
-        sessionStorage.removeItem(SESSION_KEY);
-        adminKey = "";
-      });
+    .then(function(r) {
+      if (r.status === 401) throw new Error("unauthorized");
+      return r.json();
+    })
+    .then(function(data) {
+      allOrders = data.orders || [];
+      showAdmin(); renderAll();
+    })
+    .catch(function() {
+      sessionStorage.removeItem(SESSION_KEY); adminToken = "";
+    });
   }
 
   function tryLogin() {
-    var key = document.getElementById("adminKey").value.trim();
-    if (!key) return;
+    var email = document.getElementById("adminEmail").value.trim();
+    var pass  = document.getElementById("adminPass").value;
+    if (!email || !pass) return;
     var btn = document.getElementById("loginBtn");
-    btn.textContent = "Verificando...";
-    btn.disabled = true;
-    adminKey = key;
-    fetch(API_URL + "/api/admin/orders", {
-      headers: { "x-admin-key": key },
-      cache: "no-store"
+    btn.textContent = "Verificando..."; btn.disabled = true;
+    document.getElementById("loginErr").style.display = "none";
+    fetch(API_URL + "/api/admin/login", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email, password: pass })
     })
-      .then(function(r) {
-        if (r.status === 401) throw new Error("unauthorized");
-        return r.text();
-      })
-      .then(function(text) {
-        var data = text ? JSON.parse(text) : { orders: [] };
-        sessionStorage.setItem(SESSION_KEY, key);
-        allOrders = data.orders || [];
-        showAdmin();
-        renderAll();
-      })
-      .catch(function(err) {
-        btn.textContent = "Ingresar";
-        btn.disabled = false;
-        if (err.message === "unauthorized") {
-          document.getElementById("loginErr").style.display = "block";
-        } else {
-          document.getElementById("loginErr").textContent = "Error de conexión: " + err.message;
-          document.getElementById("loginErr").style.display = "block";
-        }
-      });
+    .then(function(r){ return r.json(); })
+    .then(function(data) {
+      if (data.error) throw new Error(data.error);
+      adminToken = data.token;
+      sessionStorage.setItem(SESSION_KEY, adminToken);
+      // Now load orders
+      return fetch(API_URL + "/api/admin/orders", {
+        headers: { "Authorization": "Bearer " + adminToken }, cache: "no-store"
+      }).then(function(r){ return r.json(); });
+    })
+    .then(function(data) {
+      allOrders = data.orders || [];
+      showAdmin(); renderAll();
+    })
+    .catch(function(err) {
+      btn.textContent = "Ingresar"; btn.disabled = false;
+      var errEl = document.getElementById("loginErr");
+      errEl.textContent = err.message || "Error de conexión";
+      errEl.style.display = "block";
+    });
   }
 
   function showAdmin() {
@@ -395,17 +393,17 @@
   // ── LOGOUT ──
   document.getElementById("logoutBtn").addEventListener("click", function() {
     sessionStorage.removeItem(SESSION_KEY);
-    adminKey = ""; allOrders = [];
+    adminToken = ""; allOrders = [];
     document.getElementById("loginWrap").style.display = "flex";
     document.getElementById("adminWrap").style.display = "none";
-    document.getElementById("adminKey").value = "";
+    document.getElementById("adminPass").value = "";
     document.getElementById("loginErr").style.display = "none";
   });
 
   // ── LOAD ORDERS ──
   function loadOrders() {
     document.getElementById("tableWrap").innerHTML = '<div class="loading"><span class="spinner"></span>Cargando pedidos...</div>';
-    fetch(API_URL + "/api/admin/orders", { headers: { "x-admin-key": adminKey } })
+    fetch(API_URL + "/api/admin/orders", { headers: { "Authorization": "Bearer " + adminToken } })
       .then(function(r){ return r.json(); })
       .then(function(data) {
         allOrders = data.orders || [];
@@ -498,7 +496,7 @@
   function updateStatus(id, status) {
     fetch(API_URL + "/api/admin/orders/" + id + "/status", {
       method: "PATCH",
-      headers: { "Content-Type": "application/json", "x-admin-key": adminKey },
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + adminToken },
       body: JSON.stringify({ status: status }),
     })
     .then(function(r){ return r.json(); })
